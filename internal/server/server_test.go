@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"net/http"
@@ -508,14 +509,109 @@ func TestGoRedirects(t *testing.T) {
 	}
 }
 
-// The CSV download arrives with issue 004. Its route exists so the preview's
-// button is a real link rather than decoration.
-func TestCSVDownloadNotYetImplemented(t *testing.T) {
-	h := newTestServer(t)
-	rec := get(t, h, "/download/charizard/csv")
-	if rec.Code != http.StatusNotImplemented {
-		t.Errorf("status = %d, want 501", rec.Code)
+// ---- CSV overview ----
+
+// The CSV is the same list as the preview, as a file a spreadsheet can open: a
+// header, one row per printing, and a name that says which list it is.
+func TestCSVDownload(t *testing.T) {
+	rec := get(t, newTestServer(t), "/download/charizard/csv")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
 	}
+	if got, want := rec.Header().Get("Content-Type"), "text/csv; charset=utf-8"; got != want {
+		t.Errorf("Content-Type = %q, want %q", got, want)
+	}
+	if got, want := rec.Header().Get("Content-Disposition"),
+		`attachment; filename="charizard-en-variants.csv"`; got != want {
+		t.Errorf("Content-Disposition = %q, want %q", got, want)
+	}
+
+	body := rec.Body.String()
+	rows := csvRows(t, body)
+	if len(rows) != 8 { // the fixture's 7 printings, plus the header
+		t.Fatalf("got %d rows, want 8:\n%q", len(rows), body)
+	}
+	// Same order as the preview: chronological, with the dateless promo last.
+	if !inOrder(body, []string{"Have,Name,Set,", "Base Set,", "Base Set 2,", "Team Rocket,", "Wizards Promo,"}) {
+		t.Errorf("CSV is not in the preview's chronological order:\n%q", body)
+	}
+	// Prices are preview-only: baked into a saved file they go stale immediately.
+	if strings.ContainsAny(body, "€$") {
+		t.Error("the CSV must not carry prices")
+	}
+}
+
+// The download carries the options it was asked for, so the file is the list the
+// user was looking at.
+func TestCSVCarriesTheOptions(t *testing.T) {
+	h := newTestServer(t)
+
+	rec := get(t, h, "/download/charizard/csv?variants=0")
+	if got, want := rec.Header().Get("Content-Disposition"),
+		`attachment; filename="charizard-en-no-variants.csv"`; got != want {
+		t.Errorf("Content-Disposition = %q, want %q", got, want)
+	}
+	rows := csvRows(t, rec.Body.String())
+	if len(rows) != 5 { // four cards, plus the header
+		t.Fatalf("variants off: got %d rows, want 5", len(rows))
+	}
+	// Nothing is deleted by the toggle: the column reports what it folded away.
+	if got := rows[0][5]; got != "Printings" {
+		t.Errorf("variant column header = %q, want %q", got, "Printings")
+	}
+	if got := rows[1][5]; got != "3" {
+		t.Errorf("Base Set Charizard stands for %q printings, want 3", got)
+	}
+
+	// A Pokémon with no cards in a language still downloads a valid file.
+	empty := get(t, h, "/download/charizard/csv?lang=ja")
+	if empty.Code != http.StatusOK {
+		t.Fatalf("empty list: status = %d, want 200", empty.Code)
+	}
+	if got := csvRows(t, empty.Body.String()); len(got) != 1 {
+		t.Errorf("empty list = %d rows, want the header alone", len(got))
+	}
+}
+
+// A Dex number is a reasonable thing to type anywhere, and redirecting a download
+// to the preview would silently drop the thing the user actually asked for.
+func TestCSVDexRedirectKeepsTheFormat(t *testing.T) {
+	rec := get(t, newTestServer(t), "/download/6/csv?variants=0")
+	if rec.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want 303", rec.Code)
+	}
+	if got, want := rec.Header().Get("Location"), "/download/charizard/csv?variants=0"; got != want {
+		t.Errorf("Location = %q, want %q", got, want)
+	}
+}
+
+// An unreachable source must not download as an empty spreadsheet, which would
+// read as "this Pokémon has no cards".
+func TestCSVSourceUnavailable(t *testing.T) {
+	src := testSource(t)
+	src.err = errors.New("tcgdex is down")
+	rec := get(t, newTestServerWith(t, src), "/download/charizard/csv")
+
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Fatalf("status = %d, want 503", rec.Code)
+	}
+	if rec.Header().Get("Content-Disposition") != "" {
+		t.Error("a failure must not download as a file")
+	}
+}
+
+// csvRows reads a response body back the way a spreadsheet would, BOM and all.
+func csvRows(t *testing.T, body string) [][]string {
+	t.Helper()
+	if !strings.HasPrefix(body, "\uFEFF") {
+		// Without the BOM, Excel on Windows mangles every Japanese name in the file.
+		t.Error("CSV does not start with a UTF-8 BOM")
+	}
+	rows, err := csv.NewReader(strings.NewReader(strings.TrimPrefix(body, "\uFEFF"))).ReadAll()
+	if err != nil {
+		t.Fatalf("re-reading our own CSV: %v", err)
+	}
+	return rows
 }
 
 // ---- printable sheets ----

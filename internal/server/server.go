@@ -179,8 +179,6 @@ type previewData struct {
 	Result cards.Result
 	Rows   []cards.Printing
 	Offset int
-	// Host is the host shown in the shareable-URL affordance.
-	Host string
 }
 
 func (d previewData) Species() cards.Species { return d.Result.Species }
@@ -317,7 +315,7 @@ func (s *Server) preview(w http.ResponseWriter, r *http.Request, offset int) (pr
 	if len(rows) > rowsPerRequest {
 		rows = rows[:rowsPerRequest]
 	}
-	return previewData{Result: res, Rows: rows, Offset: offset, Host: r.Host}, true
+	return previewData{Result: res, Rows: rows, Offset: offset}, true
 }
 
 // resolve turns a request into one answer from the catalog: the slug, the
@@ -362,24 +360,46 @@ func (s *Server) resolve(w http.ResponseWriter, r *http.Request) (cards.Result, 
 		log.Printf("query %s (%s): %v", sp.Name, q.Language, err)
 		s.renderPage(w, "unavailable.html", http.StatusServiceUnavailable, previewData{
 			Result: cards.Result{Species: sp, Language: q.Language, IncludeVariants: q.IncludeVariants},
-			Host:   r.Host,
 		})
 		return cards.Result{}, false
 	}
 	return res, true
 }
 
-// handleDownload serves one output format. Sheets are here; the CSV overview
-// arrives with issue 004.
+// handleDownload serves one output format.
 func (s *Server) handleDownload(w http.ResponseWriter, r *http.Request) {
-	switch format := r.PathValue("format"); format {
+	switch r.PathValue("format") {
 	case "sheets":
 		s.handleSheets(w, r)
 	case "csv":
-		http.Error(w, "not implemented yet: "+format+" downloads arrive with issue 004",
-			http.StatusNotImplemented)
+		s.handleCSV(w, r)
 	default:
 		http.NotFound(w, r)
+	}
+}
+
+// ---- CSV overview ----
+
+// handleCSV serves the data-led output: the same list, as plain rows a collector
+// can manage in their own spreadsheet.
+//
+// It starts at resolve() like the preview and the sheets do, which is what makes
+// "the same card list, in the same order, with the same fields" true by
+// construction rather than by matching two code paths by hand.
+func (s *Server) handleCSV(w http.ResponseWriter, r *http.Request) {
+	res, ok := s.resolve(w, r)
+	if !ok {
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/csv; charset=utf-8")
+	// attachment, not inline: this one is a file to keep, unlike the sheets, which
+	// are a page to print.
+	w.Header().Set("Content-Disposition", `attachment; filename="`+cards.CSVFilename(res)+`"`)
+	if err := cards.WriteCSV(w, res); err != nil {
+		// The status line and part of the file have already gone out, so recording
+		// it is all that is left.
+		log.Printf("write csv %s: %v", res.Species.Name, err)
 	}
 }
 

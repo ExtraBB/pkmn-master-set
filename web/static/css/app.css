@@ -216,13 +216,6 @@ main {
   background: var(--accent);
 }
 
-.share-url {
-  margin-left: auto;
-  flex: none;
-  font-size: 0.8125rem;
-  color: var(--muted);
-}
-
 /* Quiet by default: the theme is a preference, not an action, so the button sits
    at muted weight and only firms up on hover. */
 .theme-toggle {
@@ -240,11 +233,6 @@ main {
   color: var(--muted);
   cursor: pointer;
   transition: color 120ms ease, border-color 120ms ease;
-}
-
-/* On the preview header the shareable URL already claims the auto margin. */
-.share-url + .theme-toggle {
-  margin-left: 0.75rem;
 }
 
 .theme-toggle:hover {
@@ -269,13 +257,33 @@ main {
 
 .site-footer {
   display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
   padding: 1.5rem;
   border-top: 1px solid var(--border-subtle);
   font-size: 0.875rem;
   color: var(--muted);
+}
+
+.footer-blurbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.disclaimer {
+  max-width: 46rem;
+  margin: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.disclaimer a {
+  color: inherit;
 }
 
 /* ---- hero ---- */
@@ -1043,10 +1051,6 @@ main {
 
   .site-header-preview {
     flex-wrap: wrap;
-  }
-
-  .share-url {
-    display: none;
   }
 
   .preview-counts {

@@ -95,7 +95,8 @@ page can define `main` without colliding with the others.
 | `/go?q=` | Resolves a submitted search box and redirects |
 | `/{pokemon}` | The preview. `?lang=en\|ja&variants=1\|0`, and the shareable URL |
 | `/rows/{pokemon}?offset=` | The next batch of rows (fragment) |
-| `/download/{pokemon}/{sheets\|csv}` | 501 until issues 003 and 004 land |
+| `/download/{pokemon}/sheets` | The print view: true-size placeholders, `?art=grey\|colour\|outline` |
+| `/download/{pokemon}/csv` | The CSV overview, as a file download |
 
 A Pokémon owns a bare URL (`/charizard`), which is why the fragment and download routes sit under
 prefixes of their own rather than under the Pokémon.

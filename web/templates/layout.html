@@ -31,11 +31,21 @@
       <header class="site-header">{{template "wordmark"}}{{template "theme-toggle"}}</header>
     {{end}}
     <main>{{template "main" .}}</main>
-    {{block "footer" .}}{{end}}
+    {{block "footer" .}}
+      <footer class="site-footer">{{template "disclaimer"}}</footer>
+    {{end}}
   </div>
 </body>
 </html>
 {{end}}
+
+{{/* An unofficial fan tool: this says so on every page, in the same words, so
+     nobody has to wonder who made it or who owns the cards it lists. */}}
+{{define "disclaimer"}}<p class="disclaimer">
+  Unofficial fan project, not affiliated with or endorsed by The Pokémon Company. Pokémon and all
+  related names, images and trademarks are © Nintendo, Creatures Inc., GAME FREAK inc. and The
+  Pokémon Company. Card data via <a href="https://tcgdex.dev" rel="noopener">TCGdex</a>.
+</p>{{end}}
 
 {{define "wordmark"}}<a class="wordmark" href="/"><span class="wordmark-dot" aria-hidden="true"></span>pkmn master set</a>{{end}}
 

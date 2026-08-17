@@ -4,9 +4,6 @@
 <header class="site-header site-header-preview">
   {{template "wordmark"}}
   {{template "search-compact" .Species.Name}}
-  {{/* The shareable URL, stated rather than implied: a previewed list is something
-       collectors send each other. */}}
-  <a class="share-url" href="{{.Canonical}}">{{.Host}}{{.Canonical}}</a>
   {{template "theme-toggle"}}
 </header>
 {{end}}

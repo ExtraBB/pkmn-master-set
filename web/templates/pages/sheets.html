@@ -54,6 +54,14 @@
     {{.Result.SheetPages}} {{plural .Result.SheetPages "page" "pages"}} ·
     {{.Species.Name}}, chronological by set release
   </p>
+
+  {{/* Screen-only, like the rest of the banner: the paper gets cut up, but the
+       page you press print from should say who owns what you are printing. */}}
+  <p class="banner-disclaimer">
+    Unofficial fan project, not affiliated with or endorsed by The Pokémon Company. Pokémon and all
+    related names, images and trademarks are © Nintendo, Creatures Inc., GAME FREAK inc. and The
+    Pokémon Company. These placeholders are for personal binder use only.
+  </p>
 </div>
 
 {{if .Result.Printings}}
