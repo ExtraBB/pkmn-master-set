@@ -16,10 +16,7 @@ import (
 )
 
 func main() {
-	addr := os.Getenv("ADDR")
-	if addr == "" {
-		addr = ":8080"
-	}
+	addr := listenAddr()
 
 	species, err := cards.EmbeddedSpecies()
 	if err != nil {
@@ -56,6 +53,19 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Printf("shutdown: %v", err)
 	}
+}
+
+// listenAddr picks the port to serve on. ADDR wins so a local run can still ask
+// for a specific interface; PORT is what hosts that assign a port inject, and is
+// how the deployed server is reached.
+func listenAddr() string {
+	if addr := os.Getenv("ADDR"); addr != "" {
+		return addr
+	}
+	if port := os.Getenv("PORT"); port != "" {
+		return ":" + port
+	}
+	return ":8080"
 }
 
 // cacheTTL is how long a fetched card list is reused. Overridable with
