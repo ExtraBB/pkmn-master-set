@@ -63,6 +63,12 @@ go test -tags=live ./...         # hits the real card API
 <td align="center"><em>Every printing…</em></td>
 <td align="center"><em>…or one row per card</em></td>
 </tr>
+<tr>
+<td colspan="2" align="center"><img src="docs/design/screenshots/print.png" alt="The print sheet view" width="420"></td>
+</tr>
+<tr>
+<td colspan="2" align="center"><em>The print view — true-size placeholders, 9 to an A4 page</em></td>
+</tr>
 </table>
 
 ## Layout
