@@ -248,6 +248,8 @@ func TestPreviewWithVariants(t *testing.T) {
 		"50 mm",          // and something to measure
 		"/download/charizard/sheets",
 		"All 7 printings shown",
+		"search=Charizard&#43;%28Base&#43;Set&#43;4%29", // the set name reads up on Bulbapedia
+		`popovertarget="zoom-base1-4`,                   // and the thumbnail opens the card
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("preview does not contain %q", want)
@@ -304,6 +306,81 @@ func TestPreviewVariantsOff(t *testing.T) {
 	}
 }
 
+// The set name is the way out of the preview and into the card's history. It goes
+// through Bulbapedia's search-and-go rather than at an article title, because this
+// source's set names do not always match Bulbapedia's and a search page is a useful
+// answer where a red link is not.
+func TestPreviewSetLinksToBulbapedia(t *testing.T) {
+	body := get(t, newTestServer(t), "/charizard").Body.String()
+
+	// html/template writes & as &amp; and + as &#43; inside an attribute.
+	const base = "https://bulbapedia.bulbagarden.net/w/index.php?go=Go&amp;search="
+	for _, want := range []string{
+		`<a class="set-link" href="` + base + `Charizard&#43;%28Base&#43;Set&#43;4%29&amp;title=Special%3ASearch"`,
+		base + `Dark&#43;Charizard&#43;%28Team&#43;Rocket&#43;4%29`, // the card's name, not the species'
+		base + `Charizard&#43;%28Wizards&#43;Promo&#43;1%29`,        // no art and no rarity, still a real link
+		`target="_blank"`, `rel="noopener noreferrer"`, // the preview is not lost to a wiki page
+		"links to the card on Bulbapedia", // said once, in the column header
+	} {
+		if !strings.Contains(body, want) {
+			t.Errorf("preview does not contain %q", want)
+		}
+	}
+
+	// The article title carries the bare number, not the 4/102 the cell shows.
+	if strings.Contains(body, "4%2F102") {
+		t.Error("the link searches for the number as 4/102")
+	}
+	// Display renders a missing field as "unknown". That is a thing to show a
+	// reader, never a thing to search for.
+	if strings.Contains(body, "search=unknown") || strings.Contains(body, "%28unknown") {
+		t.Error(`a link searches Bulbapedia for the word "unknown"`)
+	}
+}
+
+// A 44px thumbnail cannot answer "is that the printing I think it is", so clicking
+// it opens the card. It is HTML and CSS only: this site has no application
+// JavaScript, and row batches are appended with no init hook to run afterwards.
+func TestPreviewCardZoom(t *testing.T) {
+	body := get(t, newTestServer(t), "/charizard").Body.String()
+
+	for _, want := range []string{
+		`popovertarget="zoom-base1-4-holo--1st-edition-standard"`,
+		`id="zoom-base1-4-holo--1st-edition-standard" popover`,
+		`aria-label="Enlarge Charizard, Base Set 4/102"`,
+		// The enlarged art is a background image, so a closed lightbox never
+		// fetches it.
+		`style="background-image:url(https://img/base1/4/high.webp)"`,
+		"Click outside to close",
+	} {
+		if !strings.Contains(body, want) {
+			t.Errorf("preview does not contain %q", want)
+		}
+	}
+
+	// Six of the seven printings have art. The promo card has none, so it keeps its
+	// marked-blank slot and gets no control that could not do anything.
+	if got := strings.Count(body, "popovertarget="); got != 6 {
+		t.Errorf("zoom controls = %d, want 6 (one per row with art)", got)
+	}
+	if !strings.Contains(body, "thumb-blank") {
+		t.Error("the promo card has no art and must still get a marked-blank slot")
+	}
+
+	if strings.Contains(body, `src="https://img/base1/4/high`) {
+		t.Error("a hidden <img> per row would queue a full-size fetch for every row")
+	}
+	if strings.Contains(body, "ZgotmplZ") {
+		t.Error("an image URL was rejected by the template escaper")
+	}
+	// The panel itself carries no script and no inline handler: the only JavaScript
+	// on this site is the vendored htmx in the layout.
+	panel := get(t, newTestServer(t), "/charizard", "HX-Request", "true").Body.String()
+	if strings.Contains(panel, "<script") || strings.Contains(panel, "onclick") {
+		t.Error("the zoom must stay HTML and CSS only")
+	}
+}
+
 // htmx swaps the panel so the counts and the list update together; the URL still
 // has to be the shareable one.
 func TestPreviewFragment(t *testing.T) {
@@ -342,6 +419,22 @@ func TestRowsPagination(t *testing.T) {
 	}
 	if !strings.Contains(body, "All 7 printings shown") {
 		t.Error("the refreshed footer should report that the list is complete")
+	}
+	// The promo card is the whole of this batch and has no art, so the batch has a
+	// blank slot and no zoom control.
+	if !strings.Contains(body, "thumb-blank") || strings.Contains(body, "popovertarget=") {
+		t.Error("a row with no art should carry a blank slot and no zoom control")
+	}
+	if !strings.Contains(body, "set-link") {
+		t.Error("appended rows should link to Bulbapedia like every other row")
+	}
+
+	// An appended batch gets no init hook, so it has to bring its own controls.
+	batch := get(t, h, "/rows/charizard?offset=1").Body.String()
+	for _, want := range []string{`popovertarget="zoom-`, "background-image:url(", "set-link"} {
+		if !strings.Contains(batch, want) {
+			t.Errorf("an appended batch does not contain %q", want)
+		}
 	}
 
 	// An offset past the end is an empty batch, not a crash.

@@ -75,7 +75,8 @@
     <thead>
       <tr>
         <th class="col-thumb" scope="col">Card</th>
-        <th class="col-set" scope="col">Set</th>
+        {{/* Said once here rather than fifty times in the accessibility tree. */}}
+        <th class="col-set" scope="col">Set<span class="visually-hidden"> — each links to the card on Bulbapedia, in a new tab</span></th>
         <th class="col-number" scope="col">No.</th>
         <th class="col-rarity" scope="col">Rarity</th>
         {{if .Result.IncludeVariants}}
@@ -95,35 +96,64 @@
 </div>
 {{end}}
 
+{{/* The row is bound as $p because the with blocks below rebind the dot. */}}
 {{define "rows"}}
   {{- $species := .Species.Name -}}
   {{- $variants := .Result.IncludeVariants -}}
-  {{- range .Rows}}
+  {{- range $p := .Rows}}
+  {{- $card := printf "%s, %s %s" ($p.Display "name") ($p.Display "set") ($p.Display "number") -}}
   <tr>
     <td class="col-thumb">
       {{- with .ImageURL "low" "webp"}}
-        <img class="thumb" src="{{.}}" alt="" width="44" height="61" loading="lazy" decoding="async">
+        {{/* The thumbnail is the trigger: a real button, so it is reachable by
+             keyboard, with no chrome of its own so the row still reads as a
+             table of cards rather than a row of controls. */}}
+        <button class="thumb-zoom" type="button" popovertarget="zoom-{{$p.DOMID}}"
+                aria-label="Enlarge {{$card}}">
+          <img class="thumb" src="{{.}}" alt="" width="44" height="61" loading="lazy" decoding="async">
+        </button>
+        {{/* A popover, so clicking outside and Escape both dismiss it and the card
+             sits in the top layer — all from the browser, with no script. The art
+             is a background image because a background inside a display:none
+             element is never fetched: a hidden <img> per row would queue fifty
+             full-size scans on every batch. */}}
+        <div class="lightbox" id="zoom-{{$p.DOMID}}" popover>
+          <figure class="lightbox-card">
+            <div class="lightbox-image" role="img" aria-label="{{$card}}"
+                 style="background-image:url({{$p.ImageURL "high" "webp"}})"></div>
+            <figcaption class="lightbox-caption">
+              <span>{{$p.Display "set"}} {{$p.Display "number"}}{{with $p.VariantLabel}} · {{.}}{{end}}</span>
+              <span class="lightbox-hint">Click outside to close</span>
+            </figcaption>
+          </figure>
+        </div>
       {{- else}}
-        {{/* No art in the source: a striped blank, never a broken image. */}}
+        {{/* No art in the source: a striped blank, never a broken image — and no
+             zoom control, because there is nothing to enlarge. */}}
         <span class="thumb thumb-blank" role="img" aria-label="no card image"></span>
       {{- end}}
     </td>
     <td class="col-set">
-      {{.Display "set"}}
-      {{- if ne .Name $species}}
+      {{- with .BulbapediaURL}}
+        <a class="set-link" href="{{.}}" target="_blank" rel="noopener noreferrer">{{$p.Display "set"}}</a>
+      {{- else}}
+        {{/* No set name in the source: nothing to link, so nothing pretends to. */}}
+        {{$p.Display "set"}}
+      {{- end}}
+      {{- if ne $p.Name $species}}
         {{/* Dark Charizard and Blaine's Charizard read as themselves. */}}
-        <span class="row-name">{{.Display "name"}}</span>
+        <span class="row-name">{{$p.Display "name"}}</span>
       {{- end}}
     </td>
-    <td class="col-number">{{.Display "number"}}</td>
-    <td class="col-rarity">{{.Display "rarity"}}</td>
+    <td class="col-number">{{$p.Display "number"}}</td>
+    <td class="col-rarity">{{$p.Display "rarity"}}</td>
     <td class="col-variant">
-      {{- if $variants}}{{.VariantLabel}}
-      {{- else if eq .Collapsed 1}}1 printing
-      {{- else}}{{.Collapsed}} printings{{end -}}
+      {{- if $variants}}{{$p.VariantLabel}}
+      {{- else if eq $p.Collapsed 1}}1 printing
+      {{- else}}{{$p.Collapsed}} printings{{end -}}
     </td>
-    <td class="col-illustrator">{{.Display "illustrator"}}</td>
-    <td class="col-released">{{.Display "year"}}</td>
+    <td class="col-illustrator">{{$p.Display "illustrator"}}</td>
+    <td class="col-released">{{$p.Display "year"}}</td>
   </tr>
   {{- end}}
 {{end}}

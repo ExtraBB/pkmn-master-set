@@ -55,6 +55,9 @@
   --note-fg: #6b4f18;
   --note-title: #a9741a;
 
+  /* Behind an enlarged card, so the page recedes without going black. */
+  --scrim: rgb(0 20 50 / 55%);
+
   --radius: 14px;
   --radius-sm: 10px;
   --shadow: 0 1px 2px rgb(0 20 50 / 4%), 0 8px 24px rgb(0 20 50 / 6%);
@@ -104,6 +107,8 @@
     --note-border: #4a3d18;
     --note-fg: #e8d9b0;
     --note-title: #f2c86b;
+
+    --scrim: rgb(0 0 0 / 68%);
 
     --shadow: 0 1px 2px rgb(0 0 0 / 24%), 0 8px 24px rgb(0 0 0 / 24%);
   }
@@ -665,6 +670,104 @@ main {
     var(--desk) 0 4px,
     var(--surface) 4px 8px
   );
+}
+
+/* ---- card zoom ---- */
+
+/* A 44px thumbnail cannot answer "is that the printing I think it is", so it
+   opens the card. Enlarging is a look, not a place: no route, no state, nothing
+   to come back from. */
+
+.thumb-zoom {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  cursor: zoom-in;
+}
+
+.thumb-zoom:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 2px;
+}
+
+/* Closed is the default state, and stays the default where popover is not
+   supported: the enlargement is never laid out, so its art is never fetched. */
+.lightbox {
+  display: none;
+}
+
+/* The open box is the card and nothing more. That is what makes clicking outside
+   close it: the browser dismisses an auto popover on any click outside this box, so
+   stretching it across the viewport would swallow every click meant to close it. */
+.lightbox:popover-open {
+  display: block;
+  inset: 0;
+  width: fit-content;
+  max-width: calc(100% - 3rem);
+  height: fit-content;
+  max-height: calc(100% - 3rem);
+  margin: auto; /* with inset:0, centres it in the viewport */
+  padding: 0.75rem;
+  overflow: visible;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.lightbox::backdrop {
+  background: var(--scrim);
+}
+
+.lightbox-card {
+  margin: 0;
+}
+
+/* A background image rather than an <img>: a background inside a display:none
+   element is not fetched, so appending fifty rows costs fifty thumbnails and not
+   fifty full-size scans. 63:88 is the real card's ratio, the same one the printed
+   sheets are built around. */
+.lightbox-image {
+  /* Sized so the card plus its caption still fits the popover's max-height. */
+  height: min(72vh, 32rem);
+  max-width: 100%;
+  aspect-ratio: 63 / 88;
+  border-radius: 8px;
+  background: var(--desk) center / contain no-repeat;
+}
+
+.lightbox-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.625rem 0.25rem 0.125rem;
+  font-size: 0.875rem;
+  color: var(--text-2);
+}
+
+.lightbox-hint {
+  margin-left: auto;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+/* The set name is the way out of the preview and into the card's history. It keeps
+   the colour of the cell it lives in — a whole column of action-coloured links
+   would compete with the one accent this page reserves for the download — and
+   states itself on hover. */
+.set-link {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 2px;
+}
+
+.set-link:hover,
+.set-link:focus-visible {
+  color: var(--action-text);
+  text-decoration-color: currentcolor;
 }
 
 .row-name {

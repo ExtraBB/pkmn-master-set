@@ -53,6 +53,13 @@ shows the exact fields the PDF and CSV will contain — set, number, rarity, var
 year — in chronological set order, matching the print output. The footer says "Showing 8 of
 214 — every printing is in the file" so the truncation doesn't read as an incomplete list.
 
+Two affordances in the list are read-only, and deliberately quiet. The set name links to the
+card on Bulbapedia in a new tab — collectors verify there, so the preview should not be a dead
+end — styled as the cell's own text with a hairline underline, because a whole column of
+action-coloured links would compete with the download. And the thumbnail opens the card at
+readable size, because 44 px cannot answer "is that the printing I think it is". Neither adds
+state: nothing is sorted, filtered, selected or ticked off.
+
 The three download options are weighted, not equal: printable sheets is the core output and
 gets the filled dark card; PDF and CSV are outlined. Each carries its own count ("214 cards ·
 24 pages", "2 pages", "214 rows").

@@ -7,6 +7,7 @@
 package cards
 
 import (
+	"net/url"
 	"slices"
 	"strconv"
 	"strings"
@@ -160,6 +161,56 @@ func (p Printing) ImageURL(quality, ext string) string {
 		return ""
 	}
 	return p.ImageBase + "/" + quality + "." + ext
+}
+
+// bulbapediaGo is Bulbapedia's "jump to the article, else show search results"
+// entry point. Going through search rather than straight at a title means a set
+// this source spells differently lands on a search page, never on a red link.
+const bulbapediaGo = "https://bulbapedia.bulbagarden.net/w/index.php"
+
+// BulbapediaURL is where to go and read about this printing's card.
+//
+// Bulbapedia titles card articles "<Card> (<Set> <Number>)" — "Charizard (Base
+// Set 4)" — but its expansion names do not always match this source's, which is
+// why the link searches instead of deep-linking. Returns "" when the source lacks
+// the name or the set the title is built from: Display renders those as the
+// literal "unknown", and "unknown" is a thing to show a reader, never a thing to
+// search for.
+func (p Printing) BulbapediaURL() string {
+	name := strings.TrimSpace(p.Name)
+	set := strings.TrimSpace(p.SetName)
+	if name == "" || set == "" {
+		return ""
+	}
+	// The bare number, not the "4/102" the cell shows: the article title carries
+	// the number alone.
+	term := name + " (" + set
+	if n := strings.TrimSpace(p.Number); n != "" {
+		term += " " + n
+	}
+	term += ")"
+
+	q := url.Values{"go": {"Go"}, "search": {term}, "title": {"Special:Search"}}
+	return bulbapediaGo + "?" + q.Encode()
+}
+
+// DOMID is this printing's ID reduced to characters safe in an id attribute and a
+// CSS selector. ID is the card ID plus Variant.Key(), which joins on "|" and "+".
+// Rows reach the page in batches appended by htmx with no init hook, so per-row
+// markup has to name its own controls from data that is already unique.
+func (p Printing) DOMID() string {
+	var b strings.Builder
+	b.Grow(len(p.ID))
+	for _, r := range p.ID {
+		switch {
+		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', r == '-', r == '_':
+			b.WriteRune(r)
+		default:
+			// One character for one character, so distinct keys stay distinct.
+			b.WriteByte('-')
+		}
+	}
+	return b.String()
 }
 
 // Lacks reports whether a named field was absent from the source, so templates
