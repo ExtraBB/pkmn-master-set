@@ -1,0 +1,23 @@
+{{define "index.html"}}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pkmn-master-set</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/static/js/htmx.min.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>pkmn-master-set</h1>
+    <p>htmx + Go skeleton. The button below asks the server for an HTML fragment.</p>
+
+    <button hx-post="/ping" hx-target="#result" hx-swap="innerHTML">
+      Ping the server
+    </button>
+
+    <div id="result" aria-live="polite"></div>
+  </main>
+</body>
+</html>
+{{end}}
