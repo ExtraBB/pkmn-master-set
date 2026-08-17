@@ -1,0 +1,53 @@
+{{/*
+  The search box. Both forms are a real GET form pointing at /go, so Enter works
+  with JavaScript disabled; htmx only adds the suggestion list on top.
+
+  Argument: the current value of the box (a string).
+*/}}
+
+{{define "search-hero"}}
+<form class="search search-hero" action="/go" method="get" role="search" autocomplete="off">
+  <span class="search-icon" aria-hidden="true"></span>
+  <label class="visually-hidden" for="q">Search a Pokémon</label>
+  <input id="q" name="q" type="search" value="{{.}}"
+         placeholder="Search a Pokémon — try “char”"
+         role="combobox" aria-expanded="false" aria-controls="suggestions"
+         aria-autocomplete="list"
+         hx-get="/search" hx-target="#suggestions" hx-swap="innerHTML"
+         hx-trigger="input changed delay:150ms, search, focus">
+  <div id="suggestions" class="suggestions" role="listbox" aria-label="Pokémon suggestions"></div>
+</form>
+{{end}}
+
+{{define "search-compact"}}
+<form class="search search-compact" action="/go" method="get" role="search" autocomplete="off">
+  <span class="search-icon" aria-hidden="true"></span>
+  <label class="visually-hidden" for="q">Search another Pokémon</label>
+  <input id="q" name="q" type="search" value="{{.}}"
+         placeholder="Search a Pokémon"
+         role="combobox" aria-expanded="false" aria-controls="suggestions"
+         aria-autocomplete="list"
+         hx-get="/search" hx-target="#suggestions" hx-swap="innerHTML"
+         hx-trigger="input changed delay:150ms, search">
+  <div id="suggestions" class="suggestions" role="listbox" aria-label="Pokémon suggestions"></div>
+</form>
+{{end}}
+
+{{define "suggestions"}}
+  {{- if .Results -}}
+    <ul class="suggestion-list">
+      {{- range .Results}}
+        <li role="option" aria-selected="false">
+          <a href="/{{.Slug}}">
+            <img class="sprite" src="/static/sprites/{{.DexID}}.png" alt="" width="48" height="48" loading="lazy">
+            <span class="suggestion-name">{{.Name}}</span>
+            <span class="suggestion-dex">#{{printf "%03d" .DexID}}</span>
+          </a>
+        </li>
+      {{- end}}
+    </ul>
+  {{- else if .Query -}}
+    {{/* An honest miss beats an empty dropdown that looks like a broken one. */}}
+    <p class="suggestion-empty">No Pokémon matches “{{.Query}}”.</p>
+  {{- end -}}
+{{end}}

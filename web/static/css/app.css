@@ -1,51 +1,908 @@
+/* pkmn master set — see docs/design/design.md.
+   Light and dark are one system, not two designs: neutrals carry the layout and a
+   single accent carries action. Every rule below reads semantic tokens, so dark
+   mode is a token swap (indigo out, teal in) rather than a second stylesheet. */
+
 :root {
   color-scheme: light dark;
-  --fg: #1c1c1e;
-  --bg: #fbfbfd;
-  --accent: #3b6ea5;
+
+  --page: #f8faff;
+  --surface: #fefdff;
+  --desk: #e8eff9;
+
+  --border: #d4dff0;
+  --border-subtle: #e8eff9;
+
+  --text: #001432;
+  --text-2: #32486b;
+  --text-3: #4f6486;
+  --muted: #6e819e;
+
+  /* Action is what you click. Accent is reserved for the primary download and the
+     count-delta pill, so nothing else competes with them. */
+  --action: #191fbb;
+  --action-fg: #fefdff;
+  --action-text: #191fbb;
+  --action-outline: #a2bcff;
+  --action-edge: #d0deff;
+  --action-tint: #f3f7ff;
+
+  --accent: #00d9c6;
+  --accent-fg: #001432;
+  /* The teal reads well as a filled surface but not as small text on a light page,
+     so text borrows a darkened version of the same hue. */
+  --accent-text: #00857a;
+
+  /* The options bar is a tinted band in light mode; in dark, teal-tinting a whole
+     band reads as a second surface colour, so it stays neutral and the border
+     carries the accent. */
+  --bar-bg: #f3f7ff;
+  --bar-border: #d0deff;
+
+  --pill-bg: #d6f8f3;
+  --pill-fg: #005f56;
+
+  /* The primary download card is the one filled surface on the page. */
+  --promo-bg: #001432;
+  --promo-fg: #fefdff;
+  --promo-muted: #afbfd8;
+  --promo-border: #001432;
+
+  /* The print-scale warning is the only colour outside the palette, because it is
+     the only thing on the page that can silently ruin a stack of cut-outs. */
+  --note-bg: #fef6e0;
+  --note-border: #f2dfae;
+  --note-fg: #6b4f18;
+  --note-title: #a9741a;
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 2px rgb(0 20 50 / 4%), 0 8px 24px rgb(0 20 50 / 6%);
+
+  --font-display: "Jost", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fg: #e8e8ea;
-    --bg: #161618;
-    --accent: #7aa7d9;
+    --page: #051c43;
+    --surface: #092045;
+    --desk: #001432;
+
+    --border: #32486b;
+    --border-subtle: #182e52;
+
+    --text: #fefdff;
+    --text-2: #d4dff0;
+    --text-3: #afbfd8;
+    --muted: #8da0bb;
+
+    /* Teal is the only colour in dark; indigo is not used. */
+    --action: #00d9c6;
+    --action-fg: #001432;
+    --action-text: #84f5e5;
+    --action-outline: #01544c;
+    --action-edge: #01544c;
+    --action-tint: #002824;
+
+    --accent: #00d9c6;
+    --accent-fg: #001432;
+    --accent-text: #84f5e5;
+
+    --bar-bg: #071f42;
+    --bar-border: #01544c;
+
+    --pill-bg: #002824;
+    --pill-fg: #84f5e5;
+
+    --promo-bg: #04463e;
+    --promo-fg: #fefdff;
+    --promo-muted: #a8ded6;
+    --promo-border: #01544c;
+
+    --note-bg: #2b2410;
+    --note-border: #4a3d18;
+    --note-fg: #e8d9b0;
+    --note-title: #f2c86b;
+
+    --shadow: 0 1px 2px rgb(0 0 0 / 24%), 0 8px 24px rgb(0 0 0 / 24%);
   }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font: 16px/1.5 system-ui, sans-serif;
-  color: var(--fg);
-  background: var(--bg);
+  font: 400 16px/1.55 var(--font-ui);
+  color: var(--text);
+  background: var(--page);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+a {
+  color: var(--action-text);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 2px;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 main {
-  max-width: 42rem;
+  flex: 1;
+  width: 100%;
+  max-width: 76rem;
   margin: 0 auto;
-  padding: 3rem 1.25rem;
+  padding: 2rem 1.5rem 4rem;
 }
 
-h1 {
-  margin: 0 0 0.5rem;
-  font-size: 1.75rem;
+/* ---- header ---- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-button {
-  font: inherit;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--accent);
-  border-radius: 6px;
+.site-header-preview {
+  padding-bottom: 1rem;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: none;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.125rem;
+  color: var(--text);
+}
+
+.wordmark:hover {
+  text-decoration: none;
+}
+
+.wordmark-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.share-url {
+  margin-left: auto;
+  flex: none;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+/* ---- hero ---- */
+
+.hero {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 5rem 0 2rem;
+  text-align: center;
+}
+
+.hero-message {
+  padding-top: 3.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.hero h1 {
+  font-size: clamp(2.25rem, 6vw, 3.5rem);
+  line-height: 1.08;
+}
+
+.hero-sub {
+  margin: 1.5rem auto 2.5rem;
+  max-width: 34rem;
+  font-size: 1.0625rem;
+  color: var(--text-2);
+}
+
+.examples {
+  margin: 1rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--text-3);
+}
+
+.examples a {
+  color: var(--text-3);
+}
+
+.examples .sep {
+  margin: 0 0.5rem;
+  color: var(--muted);
+}
+
+/* ---- search ---- */
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+
+.search-hero {
+  max-width: 37.5rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 3.5rem;
+}
+
+.search-compact {
+  flex: 0 1 28rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+  height: 2.75rem;
+  box-shadow: none;
+  background: var(--page);
+}
+
+.search-icon {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid var(--muted);
+  border-radius: 50%;
+}
+
+.search-compact .search-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
   background: transparent;
-  color: var(--accent);
+  font: inherit;
+  color: var(--text);
+}
+
+.search-hero input {
+  font-size: 1.1875rem;
+}
+
+.search input::placeholder {
+  color: var(--muted);
+}
+
+.search input:focus {
+  outline: none;
+}
+
+.search:focus-within {
+  border-color: var(--action-outline);
+}
+
+.search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* ---- suggestions ---- */
+
+.suggestions {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  text-align: left;
+}
+
+.suggestions:empty {
+  display: none;
+}
+
+.suggestion-list {
+  margin: 0;
+  padding: 0.375rem;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.suggestion-list a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+}
+
+.suggestion-list a:hover,
+.suggestion-list a:focus-visible {
+  background: var(--action-tint);
+  text-decoration: none;
+}
+
+.sprite {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+.suggestion-name {
+  font-weight: 500;
+}
+
+.suggestion-dex {
+  margin-left: auto;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.suggestion-empty {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  font-size: 0.9375rem;
+  color: var(--text-3);
+}
+
+/* ---- preview head ---- */
+
+.preview-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.preview-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.preview-identity h1 {
+  font-size: clamp(2rem, 4vw, 2.5rem);
+}
+
+.dex {
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: var(--desk);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+/* The paper cost sits at the same weight as the Pokémon's name, because 24 pages
+   is the real decision on this screen. */
+.preview-counts {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+  text-align: right;
+}
+
+.count {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.75rem;
+  letter-spacing: -0.01em;
+}
+
+.pages {
+  margin: 0.125rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--text-3);
+}
+
+.preview-counts > div:last-child,
+.preview-counts .count + .pages {
+  text-align: right;
+}
+
+.delta-pill {
+  padding: 0.3125rem 0.75rem;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  color: var(--pill-fg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.preview-sub {
+  margin: 0.375rem 0 1.5rem;
+  color: var(--text-3);
+}
+
+/* ---- options ---- */
+
+.options {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 0.875rem 1.25rem;
+  background: var(--bar-bg);
+  border: 1px solid var(--bar-border);
+  border-radius: var(--radius);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.option-label {
+  font-size: 0.9375rem;
+  color: var(--text-2);
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.segment {
+  padding: 0.3125rem 0.875rem;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.segment:hover {
+  text-decoration: none;
+  color: var(--text);
+}
+
+.segment.is-active,
+.segment.is-active:hover {
+  background: var(--action);
+  color: var(--action-fg);
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text);
+}
+
+.switch:hover {
+  text-decoration: none;
+}
+
+.switch-track {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--border);
+  transition: background 120ms ease;
+}
+
+.switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(0 20 50 / 25%);
+  transition: transform 120ms ease;
+}
+
+.switch.is-on .switch-track {
+  background: var(--action);
+}
+
+.switch.is-on .switch-knob {
+  transform: translateX(20px);
+}
+
+.switch-label {
+  font-weight: 500;
+}
+
+.switch-hint {
+  font-size: 0.9375rem;
+  color: var(--text-3);
+}
+
+/* ---- card list ---- */
+
+.card-list {
+  margin-top: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.card-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.card-list th {
+  padding: 0.875rem 1rem;
+  background: var(--page);
+  border-bottom: 1px solid var(--border-subtle);
+  font: 500 11px/1 var(--font-ui);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.card-list td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9375rem;
+  color: var(--text-2);
+  vertical-align: middle;
+}
+
+.card-list tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.card-list .col-set {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.col-number,
+.col-released {
+  font-variant-numeric: tabular-nums;
+}
+
+.col-thumb {
+  width: 76px;
+}
+
+.col-released {
+  text-align: right;
+  color: var(--muted);
+}
+
+.col-illustrator {
+  color: var(--muted);
+}
+
+.thumb {
+  display: block;
+  width: 44px;
+  height: 61px;
+  border-radius: 3px;
+  object-fit: cover;
+  background: var(--desk);
+}
+
+/* A card the source has no art for still gets a slot, marked as blank rather than
+   rendered as a broken image. */
+.thumb-blank {
+  border: 1px solid var(--border);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--desk) 0 4px,
+    var(--surface) 4px 8px
+  );
+}
+
+.row-name {
+  display: block;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.list-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  background: var(--page);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.list-count {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-3);
+}
+
+.list-footer .btn {
+  margin-left: auto;
+}
+
+/* ---- buttons ---- */
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font: 500 0.9375rem/1.4 var(--font-ui);
   cursor: pointer;
+  white-space: nowrap;
 }
 
-button:hover {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
+.btn:hover {
+  text-decoration: none;
 }
 
-.result {
+.btn-outline {
+  background: var(--surface);
+  border-color: var(--action-outline);
+  color: var(--action-text);
+}
+
+.btn-outline:hover {
+  background: var(--action-tint);
+}
+
+.btn-accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+
+.btn-accent:hover {
+  filter: brightness(1.05);
+}
+
+/* ---- downloads ---- */
+
+/* Weighted, not equal: printable sheets is the product's reason to exist. */
+.downloads {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.download {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.375rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.download h2 {
+  font-size: 1.25rem;
+}
+
+.download p {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-3);
+}
+
+.download-foot {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.download-size {
+  font-size: 0.875rem;
+  color: var(--text-3);
+}
+
+.download-foot .btn {
+  margin-left: auto;
+}
+
+.download-primary {
+  background: var(--promo-bg);
+  border-color: var(--promo-border);
+  color: var(--promo-fg);
+}
+
+.download-primary p,
+.download-primary .download-size {
+  color: var(--promo-muted);
+}
+
+/* ---- print-scale defence ---- */
+
+.print-note {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
   margin-top: 1rem;
-  font-weight: 600;
+  padding: 1.125rem 1.5rem;
+  background: var(--note-bg);
+  border: 1px solid var(--note-border);
+  border-radius: var(--radius);
+  color: var(--note-fg);
+}
+
+.print-note p {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.print-note-title {
+  font-weight: 500;
+  color: var(--note-title);
+  margin-bottom: 0.25rem !important;
+}
+
+.ruler {
+  margin-left: auto;
+  color: var(--note-title);
+}
+
+/* Real millimetres: at 100% scale this strip measures 50 mm on paper, which is
+   what makes it a check rather than a decoration. */
+.ruler-strip {
+  width: 50mm;
+  height: 12px;
+  border: 1px solid currentcolor;
+  border-top: 0;
+  background:
+    repeating-linear-gradient(to right, currentcolor 0 1px, transparent 1px 5mm);
+}
+
+.ruler-scale {
+  display: flex;
+  justify-content: space-between;
+  width: 50mm;
+  margin-top: 2px;
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- empty state ---- */
+
+.empty {
+  margin-top: 1.25rem;
+  padding: 2.5rem 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  max-width: 42rem;
+}
+
+.empty p {
+  margin: 0 0 0.75rem;
+  color: var(--text-3);
+}
+
+.empty p:last-child {
+  margin-bottom: 0;
+}
+
+.empty-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.25rem;
+  color: var(--text) !important;
+}
+
+/* ---- narrow screens ---- */
+
+@media (max-width: 60rem) {
+  .col-illustrator {
+    display: none;
+  }
+
+  .downloads {
+    grid-template-columns: 1fr;
+  }
+
+  .site-header-preview {
+    flex-wrap: wrap;
+  }
+
+  .share-url {
+    display: none;
+  }
+
+  .preview-counts {
+    margin-left: 0;
+    text-align: left;
+  }
+}
+
+@media (max-width: 44rem) {
+  .col-rarity,
+  .col-thumb {
+    display: none;
+  }
+
+  .options {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .switch-hint {
+    display: none;
+  }
 }

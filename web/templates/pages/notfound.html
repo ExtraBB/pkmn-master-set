@@ -1,0 +1,24 @@
+{{define "title"}}No such Pokémon — pkmn master set{{end}}
+
+{{define "main"}}
+<section class="hero hero-message">
+  {{if .Query}}
+    <p class="eyebrow">Not a Pokémon we know</p>
+    <h1>Nothing here matches “{{.Query}}”.</h1>
+    <p class="hero-sub">
+      Every National Dex entry is searchable, and matching forgives casing, accents and partial
+      names. Try fewer letters — “char” finds Charizard, Charmander and Charmeleon.
+    </p>
+  {{else}}
+    <p class="eyebrow">Nothing to look up</p>
+    <h1>Pick a Pokémon to start.</h1>
+    <p class="hero-sub">Type a name and the list appears — no account, nothing to keep in sync.</p>
+  {{end}}
+  {{template "search-hero" .Query}}
+  {{if .Examples}}
+    <p class="examples">
+      {{range $i, $s := .Examples}}{{if $i}}<span class="sep" aria-hidden="true">·</span>{{end}}<a href="/{{$s.Slug}}">{{$s.Name}}</a>{{end}}
+    </p>
+  {{end}}
+</section>
+{{end}}

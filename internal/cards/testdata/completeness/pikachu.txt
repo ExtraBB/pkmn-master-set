@@ -1,0 +1,220 @@
+# Reconciled against Bulbapedia's `Pikachu_(TCG)` page on 2026-08-17.
+# Every English card Bulbapedia lists for this Pokemon is present below, except
+# the entries named under KNOWN UPSTREAM GAPS, which our data source does not
+# carry at all. Those are listed rather than silently dropped.
+#
+# KNOWN UPSTREAM GAPS (in Bulbapedia, absent from TCGdex entirely):
+#   sp 16              - Sample Set; TCGdex set exists but has no cards populated
+#   tk-hs-r 2, 16      - HS Trainer Kit (Raichu); TCGdex has 1 of 30 cards populated
+#   mep 093, 107, 109  - MEP Black Star Promos; not yet in TCGdex
+#   30th Celebration   - 023, 028, 036, 037, 040, 041, 042, 047, 050, 053, 054,
+#                        149, 150; set absent from TCGdex
+#   008/034            - Pokemon TCG Classic (Charizard & Ho-Oh ex Deck)
+#   Raid Battle 01     - Pikachu VMAX; set not in TCGdex
+
+base1 58	# Base Set Pikachu
+base2 60	# Jungle Pikachu
+basep 1	# Wizards Black Star Promos Pikachu
+basep 4	# Wizards Black Star Promos Pikachu
+basep 24	# Wizards Black Star Promos ___________'s Pikachu
+basep 25	# Wizards Black Star Promos Flying Pikachu
+basep 26	# Wizards Black Star Promos Pikachu
+basep 27	# Wizards Black Star Promos Pikachu
+basep 28	# Wizards Black Star Promos Surfing Pikachu
+base4 87	# Base Set 2 Pikachu
+gym1 81	# Gym Heroes Lt. Surge's Pikachu
+gym2 84	# Gym Challenge Lt. Surge's Pikachu
+neo1 70	# Neo Genesis Pikachu
+lc 86	# Legendary Collection Pikachu
+ecard1 124	# Expedition Base Set Pikachu
+ecard3 84	# Skyridge Pikachu
+ex2 72	# Sandstorm Pikachu
+np 12	# Nintendo Black Star Promos Pikachu
+np 35	# Nintendo Black Star Promos Pikachu δ
+ex4 43	# Team Magma vs Team Aqua Pikachu
+tk-ex-latio 6	# EX trainer Kit (Latios) Pikachu
+ex5.5 5	# Poké Card Creator Pack Pikachu
+ex6 74	# FireRed & LeafGreen Pikachu
+ex9 60	# Emerald Pikachu
+pop2 16	# POP Series 2 Pikachu
+ex12 93	# Legend Maker Pikachu δ
+ex13 78	# Holon Phantoms Pikachu
+ex13 79	# Holon Phantoms Pikachu δ
+ex13 104	# Holon Phantoms Pikachu Star
+pop4 13	# POP Series 4 Pikachu
+ex16 57	# Power Keepers Pikachu
+pop5 12	# POP Series 5 Pikachu
+pop5 13	# POP Series 5 Pikachu δ
+dpp DP16	# DP Black Star Promos Pikachu
+dp2 94	# Mysterious Treasures Pikachu
+pop6 9	# POP Series 6 Pikachu
+dp5 70	# Majestic Dawn Pikachu
+dp7 70	# Stormfront Pikachu
+pop9 15	# POP Series 9 Pikachu
+pl2 112	# Rising Rivals Pikachu
+pl2 113	# Rising Rivals Flying Pikachu
+pl2 114	# Rising Rivals Surfing Pikachu
+pl3 120	# Supreme Victors Pikachu
+pl4 71	# Arceus Pikachu
+ru1 7	# Pokémon Rumble Pikachu
+hgss1 78	# HeartGold SoulSilver Pikachu
+hgssp HGSS03	# HGSS Black Star Promos Pikachu
+hgssp HGSS18	# HGSS Black Star Promos Tropical Tidal Wave
+hgss3 61	# Undaunted Pikachu
+bw1 115	# Black & White Pikachu
+bwp BW54	# BW Black Star Promos Pikachu
+bwp BW77	# BW Black Star Promos Pikachu
+bw4 39	# Next Destinies Pikachu
+bw7 50	# Boundaries Crossed Pikachu
+xyp XY84	# XY Black Star Promos Pikachu EX
+xyp XY89	# XY Black Star Promos Pikachu
+xyp XY95	# XY Black Star Promos Pikachu
+xyp XY124	# XY Black Star Promos Pikachu EX
+xyp XY174	# XY Black Star Promos Pikachu-EX
+xyp XY202	# XY Black Star Promos Pikachu
+bw11 RC7	# Legendary Treasures Pikachu
+xy1 42	# XY Pikachu
+2014xy 5	# McDonald's Collection 2014 Pikachu
+xy3 27	# Furious Fists Pikachu
+xy6 20	# Roaring Skies Pikachu
+xy8 48	# BREAKthrough Pikachu
+2015xy 6	# McDonald's Collection 2015 Pikachu
+g1 26	# Generations Pikachu
+g1 RC29	# Generations Pikachu
+tk-xy-p 14	# XY trainer Kit (Pikachu Libre) Pikachu Libre
+tk-xy-p 30	# XY trainer Kit (Pikachu Libre) Pikachu Libre
+2016xy 6	# McDonald's Collection 2016 Pikachu
+xy12 35	# Evolutions Pikachu
+xy12 110	# Evolutions Flying Pikachu
+xy12 111	# Evolutions Surfing Pikachu
+smp SM04	# SM Black Star Promos Pikachu
+smp SM76	# SM Black Star Promos Pikachu
+smp SM81	# SM Black Star Promos Pikachu
+smp SM86	# SM Black Star Promos Pikachu
+smp SM98	# SM Black Star Promos Pikachu
+smp SM108	# SM Black Star Promos Ash's Pikachu
+smp SM109	# SM Black Star Promos Ash's Pikachu
+smp SM110	# SM Black Star Promos Ash's Pikachu
+smp SM111	# SM Black Star Promos Ash's Pikachu
+smp SM112	# SM Black Star Promos Ash's Pikachu
+smp SM113	# SM Black Star Promos Ash's Pikachu
+smp SM114	# SM Black Star Promos Ash's Pikachu
+smp SM157	# SM Black Star Promos Pikachu
+smp SM162	# SM Black Star Promos Pikachu
+smp SM168	# SM Black Star Promos Pikachu & Zekrom GX
+smp SM170	# SM Black Star Promos Detective Pikachu
+smp SM183	# SM Black Star Promos Pikachu
+smp SM190	# SM Black Star Promos Detective Pikachu
+smp SM194	# SM Black Star Promos Detective Pikachu
+smp SM206	# SM Black Star Promos Pikachu
+smp SM227	# SM Black Star Promos Pikachu
+smp SM232	# SM Black Star Promos Pikachu GX
+smp SM234	# SM Black Star Promos Pikachu
+smp SM248	# SM Black Star Promos Pikachu & Zekrom GX
+tk-sm-r 14	# SM trainer Kit (Alolan Raichu) Pikachu
+tk-sm-r 29	# SM trainer Kit (Alolan Raichu) Pikachu
+2017sm 5	# McDonald's Collection 2017 Pikachu
+sm3 40	# Burning Shadows Pikachu
+sm3.5 28	# Shining Legends Pikachu
+sm4 30	# Crimson Invasion Pikachu
+2018sm 4	# McDonald's Collection 2018 Pikachu
+sm9 33	# Team Up Pikachu & Zekrom GX
+sm9 162	# Team Up Pikachu & Zekrom GX
+sm9 184	# Team Up Pikachu & Zekrom GX
+det1 10	# Detective Pikachu Detective Pikachu
+sm10 54	# Unbroken Bonds Pikachu
+sm11 55	# Unified Minds Pikachu
+sm11 56	# Unified Minds Pikachu
+sm115 19	# Hidden Fates Pikachu
+2019sm 6	# McDonald's Collection 2019 Pikachu
+sm12 66	# Cosmic Eclipse Pikachu
+sm12 241	# Cosmic Eclipse Pikachu
+swshp SWSH020	# SWSH Black Star Promos Pikachu
+swshp SWSH039	# SWSH Black Star Promos Pikachu
+swshp SWSH061	# SWSH Black Star Promos Pikachu V
+swshp SWSH062	# SWSH Black Star Promos Pikachu VMAX
+swshp SWSH063	# SWSH Black Star Promos Pikachu V
+swshp SWSH074	# SWSH Black Star Promos Special Delivery Pikachu
+swshp SWSH139	# SWSH Black Star Promos Pikachu V-UNION
+swshp SWSH140	# SWSH Black Star Promos Pikachu V-UNION
+swshp SWSH141	# SWSH Black Star Promos Pikachu V-UNION
+swshp SWSH142	# SWSH Black Star Promos Pikachu V-UNION
+swshp SWSH143	# SWSH Black Star Promos Pikachu V
+swshp SWSH145	# SWSH Black Star Promos Pikachu V
+swshp SWSH153	# SWSH Black Star Promos Pikachu
+swshp SWSH198	# SWSH Black Star Promos Pikachu V
+swshp SWSH234	# SWSH Black Star Promos Pikachu
+swshp SWSH285	# SWSH Black Star Promos Pikachu V
+swshp SWSH286	# SWSH Black Star Promos Pikachu VMAX
+swsh1 65	# Sword & Shield Pikachu
+fut2020 1	# Pokémon Futsal 2020 Pikachu on the Ball
+swsh4 43	# Vivid Voltage Pikachu V
+swsh4 44	# Vivid Voltage Pikachu VMAX
+swsh4 170	# Vivid Voltage Pikachu V
+swsh4 188	# Vivid Voltage Pikachu VMAX
+2021swsh 25	# McDonald's Collection 2021 Pikachu
+swsh7 49	# Evolving Skies Pikachu
+cel25 5	# Celebrations Pikachu
+cel25 6	# Celebrations Flying Pikachu V
+cel25 7	# Celebrations Flying Pikachu VMAX
+cel25 8	# Celebrations Surfing Pikachu V
+cel25 9	# Celebrations Surfing Pikachu VMAX
+cel25cc CC008	# Celebrations Classic Collection _____'s Pikachu
+swsh8 86	# Fusion Strike Pikachu V
+swsh9 157	# Brilliant Stars Pikachu V
+swsh10.5 027	# Pokémon GO Pikachu
+swsh10.5 028	# Pokémon GO Pikachu
+2022swsh 7	# McDonald's Collection 2022 Pikachu
+swsh11 052	# Lost Origin Pikachu
+swsh11.5tg TG05	# Lost Origin Trainer Gallery Pikachu
+swsh11.5tg TG16	# Lost Origin Trainer Gallery Pikachu V
+swsh11.5tg TG17	# Lost Origin Trainer Gallery Pikachu VMAX
+swsh11.5tg TG29	# Lost Origin Trainer Gallery Pikachu VMAX
+swsh12 049	# Silver Tempest Pikachu
+swsh12.5 160	# Crown Zenith Pikachu
+swsh12.5gg GG30	# Crown Zenith Galarian Gallery Pikachu
+svp 027	# SVP Black Star Promos Pikachu
+svp 085	# SVP Black Star Promos Pikachu with Grey Felt Hat
+svp 088	# SVP Black Star Promos Pikachu
+svp 101	# SVP Black Star Promos Pikachu
+svp 106	# SVP Black Star Promos Pikachu ex
+svp 190	# SVP Black Star Promos Pikachu
+svp 214	# SVP Black Star Promos Pikachu
+svp 225	# SVP Black Star Promos Pikachu
+svp 500	# SVP Black Star Promos Terapagos & Friends
+sv02 062	# Paldea Evolved Pikachu
+sv02 063	# Paldea Evolved Pikachu ex
+2023sv 6	# McDonald's Collection 2023 Pikachu
+sv03.5 025	# 151 Pikachu
+sv03.5 173	# 151 Pikachu
+mfb 17	# My First Battle Pikachu
+sv04.5 018	# Paldean Fates Pikachu
+sv04.5 131	# Paldean Fates Pikachu
+sv05 051	# Temporal Forces Pikachu
+A1 094	# Genetic Apex Pikachu
+A1 096	# Genetic Apex Pikachu ex
+A1 259	# Genetic Apex Pikachu ex
+A1 281	# Genetic Apex Pikachu ex
+A1 285	# Genetic Apex Pikachu ex
+P-A 009	# Promos-A Pikachu
+P-A 015	# Promos-A Pikachu
+P-A 026	# Promos-A Pikachu
+sv08 057	# Surging Sparks Pikachu ex
+sv08 219	# Surging Sparks Pikachu ex
+sv08 238	# Surging Sparks Pikachu ex
+sv08 247	# Surging Sparks Pikachu ex
+2024sv 2	# McDonald's Collection 2024 Pikachu
+A1a 025	# Mythical Island Pikachu
+sv08.5 028	# Prismatic Evolutions Pikachu ex
+sv08.5 179	# Prismatic Evolutions Pikachu ex
+A2a 025	# Triumphant Light Pikachu
+A2b 022	# Shining Revelry Pikachu ex
+A2b 082	# Shining Revelry Pikachu ex
+A2b 092	# Shining Revelry Pikachu ex
+A3 057	# Celestial Guardians Pikachu
+B1 321	# Mega Rising Pikachu ex
+B2 049	# Fantastical Parade Pikachu
+me02.5 055	# Ascended Heroes Pikachu
+me02.5 057	# Ascended Heroes Pikachu ex
+me02.5 276	# Ascended Heroes Pikachu ex
+me02.5 277	# Ascended Heroes Pikachu ex

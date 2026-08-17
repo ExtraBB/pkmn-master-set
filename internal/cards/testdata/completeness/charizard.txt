@@ -1,0 +1,137 @@
+# Reconciled against Bulbapedia's `Charizard_(TCG)` page on 2026-08-17.
+# Every English card Bulbapedia lists for this Pokemon is present below, except
+# the entries named under KNOWN UPSTREAM GAPS, which our data source does not
+# carry at all. Those are listed rather than silently dropped.
+#
+# KNOWN UPSTREAM GAPS (in Bulbapedia, absent from TCGdex entirely):
+#   Box Topper S1/S4  - Legendary Collection box topper; TCGdex has no box-topper set
+#   Box Topper 9/12   - Skyridge box topper; same
+#   003/034           - Pokemon TCG Classic (Charizard & Ho-Oh ex Deck); set not in TCGdex
+#
+# Also present here but absent from Bulbapedia's page: 2024sv 1 (McDonald's
+# Collection 2024) and the TCG Pocket sets, which Bulbapedia covers elsewhere.
+
+base1 4	# Base Set Charizard
+base4 4	# Base Set 2 Charizard
+base5 4	# Team Rocket Dark Charizard
+base5 21	# Team Rocket Dark Charizard
+gym2 2	# Gym Challenge Blaine's Charizard
+neo4 107	# Neo Destiny Shining Charizard
+lc 3	# Legendary Collection Charizard
+ecard1 6	# Expedition Base Set Charizard
+ecard1 39	# Expedition Base Set Charizard
+ecard1 40	# Expedition Base Set Charizard
+ecard3 146	# Skyridge Charizard
+ex3 100	# Dragon Charizard
+ex6 105	# FireRed & LeafGreen Charizard ex
+ex14 4	# Crystal Guardians Charizard δ
+ex15 100	# Dragon Frontiers Charizard ☆ δ
+ex16 6	# Power Keepers Charizard
+dpp DP45	# DP Black Star Promos Charizard G
+dp3 3	# Secret Wonders Charizard
+dp7 103	# Stormfront Charizard
+pl3 20	# Supreme Victors Charizard G
+pl3 143	# Supreme Victors Charizard G
+pl4 1	# Arceus Charizard
+bw7 20	# Boundaries Crossed Charizard
+bw8 136	# Plasma Storm Charizard
+xyp XY17	# XY Black Star Promos Charizard EX
+xyp XY29	# XY Black Star Promos Charizard EX
+xyp XY121	# XY Black Star Promos Charizard EX
+bw11 19	# Legendary Treasures Charizard
+xy2 11	# Flashfire Charizard EX
+xy2 12	# Flashfire Charizard EX
+xy2 13	# Flashfire M Charizard EX
+xy2 69	# Flashfire M Charizard EX
+xy2 100	# Flashfire Charizard EX
+xy2 107	# Flashfire M Charizard EX
+xy2 108	# Flashfire M Charizard EX
+g1 11	# Generations Charizard EX
+g1 12	# Generations M Charizard EX
+g1 RC5	# Generations Charizard
+xy12 11	# Evolutions Charizard
+xy12 12	# Evolutions Charizard EX
+xy12 13	# Evolutions M Charizard EX
+xy12 101	# Evolutions M Charizard EX
+smp SM60	# SM Black Star Promos Charizard GX
+smp SM158	# SM Black Star Promos Charizard
+smp SM195	# SM Black Star Promos Charizard GX
+smp SM201	# SM Black Star Promos Reshiram & Charizard GX
+smp SM211	# SM Black Star Promos Charizard GX
+smp SM226	# SM Black Star Promos Charizard
+smp SM230	# SM Black Star Promos Charizard & Braixen GX
+smp SM247	# SM Black Star Promos Reshiram & Charizard GX
+sm3 20	# Burning Shadows Charizard GX
+sm3 150	# Burning Shadows Charizard GX
+sm7.5 3	# Dragon Majesty Charizard
+sm9 14	# Team Up Charizard
+det1 5	# Detective Pikachu Charizard
+sm10 20	# Unbroken Bonds Reshiram & Charizard GX
+sm10 194	# Unbroken Bonds Reshiram & Charizard GX
+sm10 217	# Unbroken Bonds Reshiram & Charizard GX
+sm115 9	# Hidden Fates Charizard GX
+sma SV49	# Hidden Fates Shiny Vault Charizard-GX
+sm12 22	# Cosmic Eclipse Charizard & Braixen GX
+sm12 212	# Cosmic Eclipse Charizard & Braixen GX
+sm12 251	# Cosmic Eclipse Charizard & Braixen GX
+swshp SWSH050	# SWSH Black Star Promos Charizard V
+swshp SWSH066	# SWSH Black Star Promos Charizard
+swshp SWSH075	# SWSH Black Star Promos Special Delivery Charizard
+swshp SWSH133	# SWSH Black Star Promos Lance's Charizard V
+swshp SWSH260	# SWSH Black Star Promos Charizard V
+swshp SWSH261	# SWSH Black Star Promos Charizard VMAX
+swshp SWSH262	# SWSH Black Star Promos Charizard VSTAR
+swsh3 19	# Darkness Ablaze Charizard V
+swsh3 20	# Darkness Ablaze Charizard VMAX
+swsh3.5 74	# Champion's Path Charizard VMAX
+swsh3.5 79	# Champion's Path Charizard V
+swsh4 25	# Vivid Voltage Charizard
+swsh4.5sv SV107	# Shining Fates Shiny Vault Charizard VMAX
+cel25cc CC002	# Celebrations Classic Collection Charizard
+swsh9 017	# Brilliant Stars Charizard V
+swsh9 018	# Brilliant Stars Charizard VSTAR
+swsh9 153	# Brilliant Stars Charizard V
+swsh9 154	# Brilliant Stars Charizard V
+swsh9 174	# Brilliant Stars Charizard VSTAR
+swsh10.5 010	# Pokémon GO Charizard
+swsh10.5 011	# Pokémon GO Radiant Charizard
+swsh11.5tg TG03	# Lost Origin Trainer Gallery Charizard
+swsh12.5 018	# Crown Zenith Charizard V
+swsh12.5 019	# Crown Zenith Charizard VSTAR
+swsh12.5 020	# Crown Zenith Radiant Charizard
+svp 056	# SVP Black Star Promos Charizard ex
+svp 074	# SVP Black Star Promos Charizard ex
+svp 161	# SVP Black Star Promos Charizard ex
+svp 196	# SVP Black Star Promos Charizard ex
+sv03 125	# Obsidian Flames Charizard ex
+sv03 215	# Obsidian Flames Charizard ex
+sv03 223	# Obsidian Flames Charizard ex
+sv03 228	# Obsidian Flames Charizard ex
+sv03.5 006	# 151 Charizard ex
+sv03.5 183	# 151 Charizard ex
+sv03.5 199	# 151 Charizard ex
+sv04.5 054	# Paldean Fates Charizard ex
+sv04.5 234	# Paldean Fates Charizard ex
+A1 035	# Genetic Apex Charizard
+A1 036	# Genetic Apex Charizard ex
+A1 253	# Genetic Apex Charizard ex
+A1 280	# Genetic Apex Charizard ex
+A1 284	# Genetic Apex Charizard ex
+2024sv 1	# McDonald's Collection 2024 Charizard
+A2b 010	# Shining Revelry Charizard ex
+A2b 080	# Shining Revelry Charizard ex
+A2b 108	# Shining Revelry Charizard ex
+mep 023	# MEP Black Star Promos Mega Charizard X ex
+mep 029	# MEP Black Star Promos Mega Charizard X ex
+mep 030	# MEP Black Star Promos Mega Charizard Y ex
+me02 013	# Phantasmal Flames Mega Charizard X ex
+me02 109	# Phantasmal Flames Mega Charizard X ex
+me02 125	# Phantasmal Flames Mega Charizard X ex
+me02 130	# Phantasmal Flames Mega Charizard X ex
+B1a 013	# Crimson Blaze Charizard
+B1a 014	# Crimson Blaze Mega Charizard Y ex
+B1a 077	# Crimson Blaze Mega Charizard Y ex
+B1a 087	# Crimson Blaze Mega Charizard Y ex
+B1a 091	# Crimson Blaze Charizard
+me02.5 022	# Ascended Heroes Mega Charizard Y ex
+me02.5 294	# Ascended Heroes Mega Charizard Y ex

@@ -1,0 +1,22 @@
+{{define "title"}}Card data unavailable — pkmn master set{{end}}
+
+{{define "header"}}
+<header class="site-header site-header-preview">
+  {{template "wordmark"}}
+  {{template "search-compact" .Species.Name}}
+</header>
+{{end}}
+
+{{define "main"}}
+<section class="hero hero-message">
+  <p class="eyebrow">Card data unavailable</p>
+  <h1>We can’t reach the card database right now.</h1>
+  {{/* An empty table here would read as "this Pokémon has no cards", which is the
+       one wrong answer this product must never give. */}}
+  <p class="hero-sub">
+    So rather than show you a list that might be incomplete, we’re showing you nothing at all —
+    an incomplete list is worse than no list when you’re about to cut out a stack of placeholders.
+  </p>
+  <p><a class="btn btn-outline" href="{{.Canonical}}">Try {{.Species.Name}} again</a></p>
+</section>
+{{end}}

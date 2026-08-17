@@ -1,0 +1,108 @@
+# Reconciled against Bulbapedia's `Mewtwo_(TCG)` page on 2026-08-17.
+# Every English card Bulbapedia lists for this Pokemon is present below, except
+# the entries named under KNOWN UPSTREAM GAPS, which our data source does not
+# carry at all. Those are listed rather than silently dropped.
+#
+# KNOWN UPSTREAM GAPS:
+#   me02.5 079, 281    - Ascended Heroes (Team Rocket's Mewtwo ex). These cards
+#                        ARE in TCGdex, but all 66 cards of that set are missing
+#                        a National Dex number upstream, so nothing can attribute
+#                        them to a Pokemon. Tracked by
+#                        TestUntaggedPokemonCardsStaySmall in internal/tcgdex.
+#   mep 104            - MEP Black Star Promos; not yet in TCGdex
+#   30th Celebration   - 157; set absent from TCGdex
+#   014/034            - Pokemon TCG Classic (Blastoise & Suicune ex Deck)
+#   S4/S4              - Legendary Collection box topper
+
+base1 10	# Base Set Mewtwo
+basep 3	# Wizards Black Star Promos Mewtwo
+basep 12	# Wizards Black Star Promos Mewtwo
+basep 14	# Wizards Black Star Promos Mewtwo
+base4 10	# Base Set 2 Mewtwo
+gym2 14	# Gym Challenge Rocket's Mewtwo
+neo4 109	# Neo Destiny Shining Mewtwo
+lc 29	# Legendary Collection Mewtwo
+ecard1 20	# Expedition Base Set Mewtwo
+ecard1 56	# Expedition Base Set Mewtwo
+bog 8	# Best of game Rocket’s Mewtwo
+ex1 101	# Ruby & Sapphire Mewtwo ex
+ex7 99	# Team Rocket Returns Rocket's Mewtwo ex
+ex11 12	# Delta Species Mewtwo δ
+ex13 24	# Holon Phantoms Mewtwo δ
+ex13 103	# Holon Phantoms Mewtwo Star
+dpp DP28	# DP Black Star Promos Mewtwo
+dp5 9	# Majestic Dawn Mewtwo
+dp6 11	# Legends Awakened Mewtwo
+dp6 144	# Legends Awakened Mewtwo
+ru1 9	# Pokémon Rumble Mewtwo
+bwp BW45	# BW Black Star Promos Mewtwo-EX
+bw4 54	# Next Destinies Mewtwo-EX
+bw4 98	# Next Destinies Mewtwo-EX
+xyp XY100	# XY Black Star Promos Mewtwo
+xyp XY101	# XY Black Star Promos Mewtwo
+xyp XY107	# XY Black Star Promos Mewtwo EX
+xyp XY125	# XY Black Star Promos Mewtwo EX
+xyp XY183	# XY Black Star Promos Mewtwo-EX
+bw11 53	# Legendary Treasures Mewtwo
+bw11 54	# Legendary Treasures Mewtwo-EX
+xy8 61	# BREAKthrough Mewtwo EX
+xy8 62	# BREAKthrough Mewtwo EX
+xy8 63	# BREAKthrough M Mewtwo EX
+xy8 64	# BREAKthrough M Mewtwo EX
+xy8 157	# BREAKthrough Mewtwo EX
+xy8 158	# BREAKthrough Mewtwo EX
+xy8 159	# BREAKthrough M Mewtwo EX
+xy8 160	# BREAKthrough M Mewtwo EX
+xy8 163	# BREAKthrough Mewtwo EX
+xy8 164	# BREAKthrough Mewtwo EX
+xy12 51	# Evolutions Mewtwo
+xy12 52	# Evolutions Mewtwo EX
+xy12 103	# Evolutions Mewtwo EX
+smp SM77	# SM Black Star Promos Mewtwo
+smp SM191	# SM Black Star Promos Mewtwo & Mew GX
+smp SM196	# SM Black Star Promos Mewtwo GX
+smp SM214	# SM Black Star Promos Mewtwo
+smp SM228	# SM Black Star Promos Armored Mewtwo
+sm3.5 39	# Shining Legends Mewtwo GX
+sm3.5 72	# Shining Legends Mewtwo GX
+sm3.5 76	# Shining Legends Mewtwo GX
+sm3.5 78	# Shining Legends Mewtwo GX
+det1 12	# Detective Pikachu Mewtwo
+sm10 75	# Unbroken Bonds Mewtwo
+sm11 71	# Unified Minds Mewtwo & Mew GX
+sm11 222	# Unified Minds Mewtwo & Mew GX
+sm11 242	# Unified Minds Mewtwo & Mew GX
+sm115 31	# Hidden Fates Mewtwo GX
+sma SV59	# Hidden Fates Shiny Vault Mewtwo-GX
+swshp SWSH159	# SWSH Black Star Promos Mewtwo V-UNION
+swshp SWSH160	# SWSH Black Star Promos Mewtwo V-UNION
+swshp SWSH161	# SWSH Black Star Promos Mewtwo V-UNION
+swshp SWSH162	# SWSH Black Star Promos Mewtwo V-UNION
+swshp SWSH223	# SWSH Black Star Promos Mewtwo V
+swshp SWSH229	# SWSH Black Star Promos Mewtwo V
+cel25cc CC022	# Celebrations Classic Collection Mewtwo EX
+swsh9 056	# Brilliant Stars Mewtwo
+swsh10.5 030	# Pokémon GO Mewtwo V
+swsh10.5 031	# Pokémon GO Mewtwo VSTAR
+swsh10.5 072	# Pokémon GO Mewtwo V
+swsh10.5 079	# Pokémon GO Mewtwo VSTAR
+swsh10.5 086	# Pokémon GO Mewtwo VSTAR
+swsh12.5 059	# Crown Zenith Mewtwo
+swsh12.5gg GG44	# Crown Zenith Galarian Gallery Mewtwo VSTAR
+svp 052	# SVP Black Star Promos Mewtwo
+svp 205	# SVP Black Star Promos Team Rocket's Mewtwo ex
+svp 216	# SVP Black Star Promos Team Rocket's Mewtwo ex
+sv03.5 150	# 151 Mewtwo
+sv04 058	# Paradox Rift Mewtwo ex
+sv07 059	# Stellar Crown Mewtwo
+A1 128	# Genetic Apex Mewtwo
+A1 129	# Genetic Apex Mewtwo ex
+A1 262	# Genetic Apex Mewtwo ex
+A1 282	# Genetic Apex Mewtwo ex
+A1 286	# Genetic Apex Mewtwo ex
+P-A 010	# Promos-A Mewtwo
+P-A 050	# Promos-A Mewtwo ex
+sv10 081	# Destined Rivals Team Rocket's Mewtwo ex
+sv10 213	# Destined Rivals Team Rocket's Mewtwo ex
+sv10 231	# Destined Rivals Team Rocket's Mewtwo ex
+sv10 240	# Destined Rivals Team Rocket's Mewtwo ex

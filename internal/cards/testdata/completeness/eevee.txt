@@ -1,0 +1,114 @@
+# Reconciled against Bulbapedia's `Eevee_(TCG)` page on 2026-08-17.
+# Every English card Bulbapedia lists for this Pokemon is present below, except
+# the entries named under KNOWN UPSTREAM GAPS, which our data source does not
+# carry at all. Those are listed rather than silently dropped.
+#
+# KNOWN UPSTREAM GAPS (in Bulbapedia, absent from TCGdex entirely):
+#   xya 101a           - Yellow A Alternate; TCGdex's xya set has no Eevee
+#   30th Celebration   - 116, 117, 118; set absent from TCGdex
+
+base2 51	# Jungle Eevee
+basep 11	# Wizards Black Star Promos Eevee
+base5 55	# Team Rocket Eevee
+gym2 51	# Gym Challenge Lt. Surge's Eevee
+neo2 38	# Neo Discovery Eevee
+lc 74	# Legendary Collection Eevee
+ecard2 75	# Aquapolis Eevee
+ecard3 54	# Skyridge Eevee
+ex2 63	# Sandstorm Eevee
+ex10 55	# Unseen Forces Eevee
+ex11 68	# Delta Species Eevee δ
+ex11 69	# Delta Species Eevee
+pop3 13	# POP Series 3 Eevee
+dp5 62	# Majestic Dawn Eevee
+dp5 63	# Majestic Dawn Eevee
+pl2 59	# Rising Rivals Eevee
+hgss3 47	# Undaunted Eevee
+hgss3 48	# Undaunted Eevee
+col1 56	# Call of Legends Eevee
+bwp BW94	# BW Black Star Promos Eevee
+bwp BW97	# BW Black Star Promos Eevee
+bw5 83	# Dark Explorers Eevee
+bw5 84	# Dark Explorers Eevee
+bw9 89	# Plasma Freeze Eevee
+bw9 90	# Plasma Freeze Eevee
+bw11 RC14	# Legendary Treasures Eevee
+tk-xy-sy 13	# XY trainer Kit (Sylveon) Eevee
+tk-xy-sy 21	# XY trainer Kit (Sylveon) Eevee
+xy3 80	# Furious Fists Eevee
+xy7 63	# Ancient Origins Eevee
+tk-xy-su 4	# XY trainer Kit (Suicune) Eevee
+2016xy 12	# McDonald's Collection 2016 Eevee
+smp SM169	# SM Black Star Promos Eevee & Snorlax GX
+smp SM174	# SM Black Star Promos Eevee GX
+smp SM175	# SM Black Star Promos Eevee GX
+smp SM176	# SM Black Star Promos Eevee GX
+smp SM184	# SM Black Star Promos Eevee
+smp SM233	# SM Black Star Promos Eevee GX
+smp SM235	# SM Black Star Promos Eevee
+smp SM242	# SM Black Star Promos Eevee GX
+sm1 101	# Sun & Moon Eevee
+sm5 104	# Ultra Prism Eevee
+sm5 105	# Ultra Prism Eevee
+2018sm 11	# McDonald's Collection 2018 Eevee
+sm8 155	# Lost Thunder Eevee
+sm9 120	# Team Up Eevee & Snorlax GX
+sm9 171	# Team Up Eevee & Snorlax GX
+sm9 191	# Team Up Eevee & Snorlax GX
+sm115 48	# Hidden Fates Eevee
+sm115 49	# Hidden Fates Eevee
+sma SV41	# Hidden Fates Shiny Vault Eevee
+2019sm 12	# McDonald's Collection 2019 Eevee
+sm12 166	# Cosmic Eclipse Eevee
+sm12 167	# Cosmic Eclipse Eevee
+swshp SWSH042	# SWSH Black Star Promos Eevee
+swshp SWSH065	# SWSH Black Star Promos Eevee V
+swshp SWSH087	# SWSH Black Star Promos Eevee VMAX
+swshp SWSH095	# SWSH Black Star Promos Eevee
+swshp SWSH118	# SWSH Black Star Promos Eevee
+swshp SWSH127	# SWSH Black Star Promos Eevee
+swshp SWSH175	# SWSH Black Star Promos Eevee
+swshp SWSH190	# SWSH Black Star Promos Eevee
+swshp SWSH212	# SWSH Black Star Promos Eevee
+swshp SWSH230	# SWSH Black Star Promos Radiant Eevee
+fut2020 2	# Pokémon Futsal 2020 Eevee on the Ball
+swsh4 130	# Vivid Voltage Eevee
+swsh4.5 52	# Shining Fates Eevee
+swsh7 125	# Evolving Skies Eevee
+swsh8 205	# Fusion Strike Eevee
+swsh9.5tg TG11	# Brilliant Stars Trainer Gallery Eevee
+swsh10 119	# Astral Radiance Eevee
+swsh10.5 054	# Pokémon GO Eevee
+swsh12.5 108	# Crown Zenith Eevee V
+svp 043	# SVP Black Star Promos Eevee
+svp 173	# SVP Black Star Promos Eevee
+svp 174	# SVP Black Star Promos Eevee ex
+svp 200	# SVP Black Star Promos Eevee
+sv03 166	# Obsidian Flames Eevee
+sv03.5 133	# 151 Eevee
+sv06 135	# Twilight Masquerade Eevee
+sv06 188	# Twilight Masquerade Eevee
+sv06.5 050	# Shrouded Fable Eevee
+sv07 113	# Stellar Crown Eevee
+A1 206	# Genetic Apex Eevee
+A1 207	# Genetic Apex Eevee
+A1 208	# Genetic Apex Eevee
+A1 248	# Genetic Apex Eevee
+P-A 030	# Promos-A Eevee
+P-A 092	# Promos-A Eevee
+sv08 143	# Surging Sparks Eevee
+2024sv 13	# McDonald's Collection 2024 Eevee
+A1a 061	# Mythical Island Eevee
+sv08.5 074	# Prismatic Evolutions Eevee
+sv08.5 075	# Prismatic Evolutions Eevee ex
+sv08.5 167	# Prismatic Evolutions Eevee ex
+A2 126	# Space-Time Smackdown Eevee
+A2a 062	# Triumphant Light Eevee
+A3b 055	# Eevee Grove Eevee
+A3b 056	# Eevee Grove Eevee ex
+A3b 078	# Eevee Grove Eevee
+A3b 083	# Eevee Grove Eevee ex
+A3b 092	# Eevee Grove Eevee ex
+A4 134	# Wisdom of Sea and Sky Eevee
+A4 231	# Wisdom of Sea and Sky Eevee
+B1 184	# Mega Rising Eevee

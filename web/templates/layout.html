@@ -1,0 +1,26 @@
+{{define "layout"}}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{block "title" .}}pkmn master set{{end}}</title>
+  <meta name="description" content="Every card ever printed of one Pokémon, as placeholder cards at true binder size — or a PDF table, or a plain CSV.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@500&family=Inter:wght@400;500&display=swap">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/static/js/htmx.min.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    {{block "header" .}}
+      <header class="site-header">{{template "wordmark"}}</header>
+    {{end}}
+    <main>{{template "main" .}}</main>
+    {{block "footer" .}}{{end}}
+  </div>
+</body>
+</html>
+{{end}}
+
+{{define "wordmark"}}<a class="wordmark" href="/"><span class="wordmark-dot" aria-hidden="true"></span>pkmn master set</a>{{end}}

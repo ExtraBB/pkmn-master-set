@@ -1,0 +1,211 @@
+{{/*
+  The preview panel. This whole block is what htmx swaps when an option is
+  toggled, which is why the counts, the options, the table and the download sizes
+  all live inside it: they are one answer and must never disagree.
+*/}}
+
+{{define "preview-panel"}}
+<section id="preview" class="preview">
+  <div class="preview-head">
+    <div class="preview-identity">
+      <h1>{{.Species.Name}}</h1>
+      <span class="dex">#{{printf "%03d" .Species.DexID}}</span>
+    </div>
+    <div class="preview-counts">
+      {{- if .Result.HasFoldedPrintings}}
+        {{/* The variants toggle can halve the paper cost, so state the delta
+             rather than leaving it to be noticed. */}}
+        <span class="delta-pill">−{{.Result.FoldedPrintings}} {{plural .Result.FoldedPrintings "card" "cards"}}{{with .Result.FoldedPages}} · −{{.}} {{plural . "page" "pages"}}{{end}}</span>
+      {{- end}}
+      <p class="count" aria-live="polite">{{.Result.PrintingCount}} {{plural .Result.PrintingCount "card" "cards"}}</p>
+      <p class="pages">≈ {{.Result.SheetPages}} {{plural .Result.SheetPages "page" "pages"}} of placeholders</p>
+    </div>
+  </div>
+  <p class="preview-sub">Chronological by set release — the order you’ll get on paper.</p>
+
+  {{template "options" .}}
+
+  {{if .Result.Printings}}
+    {{template "card-list" .}}
+    {{template "downloads" .}}
+    {{template "print-note" .}}
+  {{else}}
+    {{template "empty-list" .}}
+  {{end}}
+</section>
+{{end}}
+
+{{/* Options are real links, so every state of the list has a URL you can share. */}}
+{{define "options"}}
+<div class="options">
+  <div class="option option-language">
+    <span class="option-label">Language</span>
+    <span class="segmented">
+      <a class="segment{{if not .IsJapanese}} is-active{{end}}" href="{{.EnglishURL}}"
+         hx-get="{{.EnglishURL}}" hx-target="#preview" hx-swap="outerHTML" hx-push-url="true"
+         {{if not .IsJapanese}}aria-current="true"{{end}}>English</a>
+      <a class="segment{{if .IsJapanese}} is-active{{end}}" href="{{.JapaneseURL}}"
+         hx-get="{{.JapaneseURL}}" hx-target="#preview" hx-swap="outerHTML" hx-push-url="true"
+         {{if .IsJapanese}}aria-current="true"{{end}}>日本語</a>
+    </span>
+  </div>
+  <div class="option option-variants">
+    {{- if .Result.IncludeVariants}}
+      <a class="switch is-on" href="{{.VariantsOffURL}}" role="switch" aria-checked="true"
+         hx-get="{{.VariantsOffURL}}" hx-target="#preview" hx-swap="outerHTML" hx-push-url="true">
+        <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
+        <span class="switch-label">Include variants</span>
+        <span class="switch-hint">each printing gets its own placeholder</span>
+      </a>
+    {{- else}}
+      <a class="switch" href="{{.VariantsOnURL}}" role="switch" aria-checked="false"
+         hx-get="{{.VariantsOnURL}}" hx-target="#preview" hx-swap="outerHTML" hx-push-url="true">
+        <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
+        <span class="switch-label">Include variants</span>
+        <span class="switch-hint">one placeholder per card</span>
+      </a>
+    {{- end}}
+  </div>
+</div>
+{{end}}
+
+{{define "card-list"}}
+<div class="card-list">
+  <table>
+    <thead>
+      <tr>
+        <th class="col-thumb" scope="col">Card</th>
+        <th class="col-set" scope="col">Set</th>
+        <th class="col-number" scope="col">No.</th>
+        <th class="col-rarity" scope="col">Rarity</th>
+        {{if .Result.IncludeVariants}}
+          <th class="col-variant" scope="col">Variant</th>
+        {{else}}
+          {{/* Turning variants off folds rows away rather than deleting cards, so
+               each row says how many printings it stands for. */}}
+          <th class="col-variant" scope="col">Printings</th>
+        {{end}}
+        <th class="col-illustrator" scope="col">Illustrator</th>
+        <th class="col-released" scope="col">Released</th>
+      </tr>
+    </thead>
+    <tbody id="rows">{{template "rows" .}}</tbody>
+  </table>
+  <div id="list-footer" class="list-footer">{{template "list-footer" .}}</div>
+</div>
+{{end}}
+
+{{define "rows"}}
+  {{- $species := .Species.Name -}}
+  {{- $variants := .Result.IncludeVariants -}}
+  {{- range .Rows}}
+  <tr>
+    <td class="col-thumb">
+      {{- with .ImageURL "low" "webp"}}
+        <img class="thumb" src="{{.}}" alt="" width="44" height="61" loading="lazy" decoding="async">
+      {{- else}}
+        {{/* No art in the source: a striped blank, never a broken image. */}}
+        <span class="thumb thumb-blank" role="img" aria-label="no card image"></span>
+      {{- end}}
+    </td>
+    <td class="col-set">
+      {{.Display "set"}}
+      {{- if ne .Name $species}}
+        {{/* Dark Charizard and Blaine's Charizard read as themselves. */}}
+        <span class="row-name">{{.Display "name"}}</span>
+      {{- end}}
+    </td>
+    <td class="col-number">{{.Display "number"}}</td>
+    <td class="col-rarity">{{.Display "rarity"}}</td>
+    <td class="col-variant">
+      {{- if $variants}}{{.VariantLabel}}
+      {{- else if eq .Collapsed 1}}1 printing
+      {{- else}}{{.Collapsed}} printings{{end -}}
+    </td>
+    <td class="col-illustrator">{{.Display "illustrator"}}</td>
+    <td class="col-released">{{.Display "year"}}</td>
+  </tr>
+  {{- end}}
+{{end}}
+
+{{define "list-footer"}}
+  <p class="list-count">
+    {{- if .HasMore}}
+      Showing {{.Shown}} of {{.Result.PrintingCount}} — every printing is in the file
+    {{- else}}
+      All {{.Result.PrintingCount}} {{plural .Result.PrintingCount "printing" "printings"}} shown — this is the whole file
+    {{- end}}
+  </p>
+  {{if .HasMore}}
+    <button type="button" class="btn btn-outline"
+            hx-get="{{.RowsURL}}" hx-target="#rows" hx-swap="beforeend">
+      Show {{.NextBatch}} more
+    </button>
+  {{end}}
+{{end}}
+
+{{/* Appended rows, plus the footer swapped out of band so the count keeps up. */}}
+{{define "rows-batch"}}{{template "rows" .}}
+<div id="list-footer" class="list-footer" hx-swap-oob="true">{{template "list-footer" .}}</div>
+{{end}}
+
+{{define "downloads"}}
+<div class="downloads">
+  <div class="download download-primary">
+    <h2>Printable sheets</h2>
+    <p>Cut-out placeholders at true 63 × 88 mm, cut lines between. Slot straight into empty pockets.</p>
+    <div class="download-foot">
+      <span class="download-size">{{.Result.PrintingCount}} {{plural .Result.PrintingCount "card" "cards"}} · {{.Result.SheetPages}} {{plural .Result.SheetPages "page" "pages"}}</span>
+      <a class="btn btn-accent" href="{{.DownloadURL "sheets"}}">Download</a>
+    </div>
+  </div>
+  <div class="download">
+    <h2>PDF overview</h2>
+    <p>A reading table of the same list, for the binder’s front pocket.</p>
+    <div class="download-foot">
+      <span class="download-size">{{.Result.OverviewPages}} {{plural .Result.OverviewPages "page" "pages"}}</span>
+      <a class="btn btn-outline" href="{{.DownloadURL "pdf"}}">Download</a>
+    </div>
+  </div>
+  <div class="download">
+    <h2>CSV</h2>
+    <p>One row per card variant, unstyled. Sortable the moment it opens.</p>
+    <div class="download-foot">
+      <span class="download-size">{{.Result.PrintingCount}} {{plural .Result.PrintingCount "row" "rows"}}</span>
+      <a class="btn btn-outline" href="{{.DownloadURL "csv"}}">Download</a>
+    </div>
+  </div>
+</div>
+{{end}}
+
+{{/* The scale defence: browser and printer "fit to page" scaling is the failure
+     mode that ruins a whole stack of cut-outs, so it is warned about here, before
+     the download, and verifiable on the sheet itself. */}}
+{{define "print-note"}}
+<div class="print-note">
+  <div>
+    <p class="print-note-title">Print at 100% — turn off “fit to page”</p>
+    <p>Every sheet carries a 50 mm reference strip. Print one page, measure it, then print the stack.</p>
+  </div>
+  <div class="ruler" aria-hidden="true">
+    <div class="ruler-strip"></div>
+    <div class="ruler-scale"><span>0</span><span>50 mm</span></div>
+  </div>
+</div>
+{{end}}
+
+{{define "empty-list"}}
+<div class="empty">
+  {{- if .IsJapanese}}
+    <p class="empty-title">No Japanese cards for {{.Species.Name}} in our source.</p>
+    <p>Japanese coverage is materially thinner than English — this is a gap in the data, not a
+      statement that the cards do not exist.</p>
+    <p><a href="{{.EnglishURL}}">See the English list instead</a></p>
+  {{- else}}
+    <p class="empty-title">No cards for {{.Species.Name}} yet.</p>
+    <p>Our source records no {{.Species.Name}} cards in English. Some Pokémon genuinely have never
+      been printed on a card; others are a gap in the data worth reporting.</p>
+    <p><a href="{{.JapaneseURL}}">Try the Japanese list</a></p>
+  {{- end}}
+</div>
+{{end}}

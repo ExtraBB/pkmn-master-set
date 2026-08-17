@@ -1,0 +1,64 @@
+# Reconciled against Bulbapedia's `Umbreon_(TCG)` page on 2026-08-17.
+# Every English card Bulbapedia lists for this Pokemon is present below, except
+# the entries named under KNOWN UPSTREAM GAPS, which our data source does not
+# carry at all. Those are listed rather than silently dropped.
+#
+# KNOWN UPSTREAM GAPS (in Bulbapedia, absent from TCGdex entirely):
+#   mep 110            - MEP Black Star Promos; not yet in TCGdex
+#   30th Celebration   - 091, 092; set absent from TCGdex
+#
+# Also present here but absent from Bulbapedia's page: 2024sv 9 (McDonald's
+# Collection 2024 Umbreon).
+
+neo2 13	# Neo Discovery Umbreon
+neo2 32	# Neo Discovery Umbreon
+ecard2 41	# Aquapolis Umbreon
+ecard2 H29	# Aquapolis Umbreon
+ecard3 32	# Skyridge Umbreon
+ecard3 H30	# Skyridge Umbreon
+ex2 24	# Sandstorm Umbreon
+ex10 112	# Unseen Forces Umbreon ex
+ex11 17	# Delta Species Umbreon δ
+pop5 17	# POP Series 5 Umbreon ☆
+dp5 32	# Majestic Dawn Umbreon
+hgss3 10	# Undaunted Umbreon
+hgss3 86	# Undaunted Umbreon
+col1 22	# Call of Legends Umbreon
+bwp BW93	# BW Black Star Promos Umbreon
+bw5 60	# Dark Explorers Umbreon
+bw5 61	# Dark Explorers Umbreon
+bw9 64	# Plasma Freeze Umbreon
+xyp XY96	# XY Black Star Promos Umbreon
+xy10 55	# Fates Collide Umbreon EX
+xy10 119	# Fates Collide Umbreon EX
+smp SM36	# SM Black Star Promos Umbreon GX
+smp SM241	# SM Black Star Promos Umbreon & Darkrai GX
+sm1 80	# Sun & Moon Umbreon GX
+sm1 142	# Sun & Moon Umbreon GX
+sm1 154	# Sun & Moon Umbreon GX
+sm8 120	# Lost Thunder Umbreon
+sm11 125	# Unified Minds Umbreon & Darkrai GX
+sma SV69	# Hidden Fates Shiny Vault Umbreon-GX
+swshp SWSH129	# SWSH Black Star Promos Umbreon
+swshp SWSH203	# SWSH Black Star Promos Umbreon V
+swsh7 94	# Evolving Skies Umbreon V
+swsh7 95	# Evolving Skies Umbreon VMAX
+swsh7 188	# Evolving Skies Umbreon V
+swsh7 189	# Evolving Skies Umbreon V
+swsh7 214	# Evolving Skies Umbreon VMAX
+swsh7 215	# Evolving Skies Umbreon VMAX
+cel25cc CC015	# Celebrations Classic Collection Umbreon ☆
+swsh9.5tg TG22	# Brilliant Stars Trainer Gallery Umbreon V
+swsh9.5tg TG23	# Brilliant Stars Trainer Gallery Umbreon VMAX
+svp 176	# SVP Black Star Promos Umbreon ex
+sv03 130	# Obsidian Flames Umbreon
+2024sv 9	# McDonald's Collection 2024 Umbreon
+sv08.5 059	# Prismatic Evolutions Umbreon
+sv08.5 060	# Prismatic Evolutions Umbreon ex
+sv08.5 161	# Prismatic Evolutions Umbreon ex
+A3b 043	# Eevee Grove Umbreon
+A3b 077	# Eevee Grove Umbreon
+A4 112	# Wisdom of Sea and Sky Umbreon ex
+A4 193	# Wisdom of Sea and Sky Umbreon ex
+A4 208	# Wisdom of Sea and Sky Umbreon ex
+B2 231	# Fantastical Parade Umbreon ex

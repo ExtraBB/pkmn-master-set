@@ -1,0 +1,26 @@
+{{define "title"}}pkmn master set — print the gaps in your binder{{end}}
+
+{{define "main"}}
+<section class="hero">
+  <p class="eyebrow">For one-Pokémon collectors</p>
+  <h1>Pick a Pokémon.<br>Print the gaps in your binder.</h1>
+  <p class="hero-sub">
+    Every card ever printed of one Pokémon, as placeholder cards at true binder size — or a PDF
+    table, or a plain CSV. No account, nothing to keep in sync.
+  </p>
+  {{template "search-hero" .Query}}
+  {{if .Examples}}
+    <p class="examples">
+      {{range $i, $s := .Examples}}{{if $i}}<span class="sep" aria-hidden="true">·</span>{{end}}<a href="/{{$s.Slug}}">{{$s.Name}}</a>{{end}}
+    </p>
+  {{end}}
+</section>
+{{end}}
+
+{{define "footer"}}
+<footer class="site-footer">
+  <span>Printable sheets, cut to 63 × 88 mm</span>
+  <span>PDF overview</span>
+  <span>CSV</span>
+</footer>
+{{end}}

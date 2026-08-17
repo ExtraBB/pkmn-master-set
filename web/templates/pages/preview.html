@@ -1,0 +1,13 @@
+{{define "title"}}{{.Species.Name}} — every printing, ready to print{{end}}
+
+{{define "header"}}
+<header class="site-header site-header-preview">
+  {{template "wordmark"}}
+  {{template "search-compact" .Species.Name}}
+  {{/* The shareable URL, stated rather than implied: a previewed list is something
+       collectors send each other. */}}
+  <a class="share-url" href="{{.Canonical}}">{{.Host}}{{.Canonical}}</a>
+</header>
+{{end}}
+
+{{define "main"}}{{template "preview-panel" .}}{{end}}
