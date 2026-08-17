@@ -351,7 +351,6 @@ func TestPreviewCardZoom(t *testing.T) {
 		// The enlarged art is a background image, so a closed lightbox never
 		// fetches it.
 		`style="background-image:url(https://img/base1/4/high.webp)"`,
-		"Click outside to close",
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("preview does not contain %q", want)

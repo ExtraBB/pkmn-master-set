@@ -26,8 +26,8 @@ import (
 // a slow first paint for a decision the first batch already supports.
 const rowsPerRequest = 50
 
-// queryTimeout bounds one card-list fetch. A Japanese list costs one upstream
-// request per card, so this is generous rather than tight.
+// queryTimeout bounds one card-list fetch. Every list costs one upstream request
+// per card in every language, so this is generous rather than tight.
 const queryTimeout = 30 * time.Second
 
 // suggestionLimit is how many typeahead rows to offer: enough that "char" shows the

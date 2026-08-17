@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -12,10 +13,18 @@ import (
 	"github.com/ExtraBB/pkmn-master-set/internal/tcgdex"
 )
 
-const oneCharizard = `{"data":{"cards":[{"id":"base1-4","localId":"4","name":"Charizard","rarity":"Rare Holo",
-  "illustrator":"Mitsuhiro Arita","image":"https://assets.tcgdex.net/en/base/base1/4",
-  "variants_detailed":[{"type":"holo","subtype":"unlimited","size":"standard"}],
-  "set":{"id":"base1","name":"Base Set","cardCount":{"official":102,"total":102}}}]}}`
+// A card lookup is a REST list request plus one detail request per card, so these
+// fixtures come in pairs.
+const (
+	charizardList   = `[{"id":"base1-4"}]`
+	charizardDetail = `{"id":"base1-4","localId":"4","name":"Charizard","dexId":[6],"rarity":"Rare Holo",
+	  "illustrator":"Mitsuhiro Arita","image":"https://assets.tcgdex.net/en/base/base1/4",
+	  "variants_detailed":[{"type":"holo","subtype":"unlimited","size":"standard"}],
+	  "set":{"id":"base1","name":"Base Set","cardCount":{"official":102,"total":102}}}`
+
+	base1SetList   = `[{"id":"base1","name":"Base Set","cardCount":{"official":102,"total":102}}]`
+	base1SetDetail = `{"id":"base1","name":"Base Set","releaseDate":"1999-01-09","serie":{"name":"Base"},"cardCount":{"official":102,"total":102}}`
+)
 
 func liveSource(t *testing.T, ttl time.Duration, h http.HandlerFunc) *LiveSource {
 	t.Helper()
@@ -25,32 +34,53 @@ func liveSource(t *testing.T, ttl time.Duration, h http.HandlerFunc) *LiveSource
 	return NewLiveSource(client, ttl)
 }
 
-func TestCachedCardsAreNotRefetched(t *testing.T) {
-	var calls atomic.Int32
-	src := liveSource(t, time.Hour, func(w http.ResponseWriter, r *http.Request) {
-		calls.Add(1)
-		w.Write([]byte(oneCharizard))
+// isDetail distinguishes /en/cards/base1-4 from /en/cards. The cache tests count
+// fetches rather than requests, and the list request is the one that happens
+// exactly once per fetch.
+func isDetail(r *http.Request) bool { return strings.Count(r.URL.Path, "/") > 2 }
+
+// charizardSource serves one Charizard over REST and counts how many times the
+// card list was fetched.
+func charizardSource(t *testing.T, ttl time.Duration) (*LiveSource, *atomic.Int32) {
+	t.Helper()
+	var fetches atomic.Int32
+	src := liveSource(t, ttl, func(w http.ResponseWriter, r *http.Request) {
+		if isDetail(r) {
+			w.Write([]byte(charizardDetail))
+			return
+		}
+		fetches.Add(1)
+		w.Write([]byte(charizardList))
 	})
+	return src, &fetches
+}
+
+func TestCachedCardsAreNotRefetched(t *testing.T) {
+	src, fetches := charizardSource(t, time.Hour)
 
 	for range 3 {
 		if _, err := src.Cards(context.Background(), LangEN, 6); err != nil {
 			t.Fatalf("Cards: %v", err)
 		}
 	}
-	if n := calls.Load(); n != 1 {
-		t.Errorf("made %d upstream calls, want 1", n)
+	if n := fetches.Load(); n != 1 {
+		t.Errorf("made %d upstream fetches, want 1", n)
 	}
 }
 
 // A burst of visitors asking for the same Pokémon should produce one upstream
 // request, not one per visitor.
 func TestConcurrentRequestsShareOneFetch(t *testing.T) {
-	var calls atomic.Int32
+	var fetches atomic.Int32
 	release := make(chan struct{})
 	src := liveSource(t, time.Hour, func(w http.ResponseWriter, r *http.Request) {
-		calls.Add(1)
+		if isDetail(r) {
+			w.Write([]byte(charizardDetail))
+			return
+		}
+		fetches.Add(1)
 		<-release
-		w.Write([]byte(oneCharizard))
+		w.Write([]byte(charizardList))
 	})
 
 	var wg sync.WaitGroup
@@ -73,17 +103,13 @@ func TestConcurrentRequestsShareOneFetch(t *testing.T) {
 			t.Fatalf("caller %d: %v", i, err)
 		}
 	}
-	if n := calls.Load(); n != 1 {
-		t.Errorf("made %d upstream calls for 10 concurrent readers, want 1", n)
+	if n := fetches.Load(); n != 1 {
+		t.Errorf("made %d upstream fetches for 10 concurrent readers, want 1", n)
 	}
 }
 
 func TestStaleEntriesAreRefetched(t *testing.T) {
-	var calls atomic.Int32
-	src := liveSource(t, time.Nanosecond, func(w http.ResponseWriter, r *http.Request) {
-		calls.Add(1)
-		w.Write([]byte(oneCharizard))
-	})
+	src, fetches := charizardSource(t, time.Nanosecond)
 
 	for range 2 {
 		if _, err := src.Cards(context.Background(), LangEN, 6); err != nil {
@@ -91,8 +117,8 @@ func TestStaleEntriesAreRefetched(t *testing.T) {
 		}
 		time.Sleep(time.Millisecond)
 	}
-	if n := calls.Load(); n != 2 {
-		t.Errorf("made %d upstream calls, want 2", n)
+	if n := fetches.Load(); n != 2 {
+		t.Errorf("made %d upstream fetches, want 2", n)
 	}
 }
 
@@ -105,7 +131,11 @@ func TestStaleDataIsServedWhenRefreshFails(t *testing.T) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		w.Write([]byte(oneCharizard))
+		if isDetail(r) {
+			w.Write([]byte(charizardDetail))
+			return
+		}
+		w.Write([]byte(charizardList))
 	})
 
 	if _, err := src.Cards(context.Background(), LangEN, 6); err != nil {
@@ -129,14 +159,16 @@ func TestStaleDataIsServedWhenRefreshFails(t *testing.T) {
 func TestFailuresAreNotCached(t *testing.T) {
 	var fail atomic.Bool
 	fail.Store(true)
-	var calls atomic.Int32
 	src := liveSource(t, time.Hour, func(w http.ResponseWriter, r *http.Request) {
-		calls.Add(1)
 		if fail.Load() {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		w.Write([]byte(oneCharizard))
+		if isDetail(r) {
+			w.Write([]byte(charizardDetail))
+			return
+		}
+		w.Write([]byte(charizardList))
 	})
 
 	if _, err := src.Cards(context.Background(), LangEN, 6); err == nil {
@@ -158,7 +190,7 @@ func TestSetsAreCachedIndefinitely(t *testing.T) {
 	var calls atomic.Int32
 	src := liveSource(t, time.Nanosecond, func(w http.ResponseWriter, r *http.Request) {
 		calls.Add(1)
-		w.Write([]byte(`{"id":"base1","name":"Base Set","releaseDate":"1999-01-09","serie":{"name":"Base"},"cardCount":{"official":102,"total":102}}`))
+		w.Write([]byte(base1SetDetail))
 	})
 
 	for range 3 {
@@ -177,12 +209,17 @@ func TestSetsAreCachedIndefinitely(t *testing.T) {
 }
 
 // Warming the set index up front saves the first visitor a lookup per set in
-// their Pokémon's list.
+// their Pokémon's list — including the release date, which only the set detail
+// carries.
 func TestWarmSetsPopulatesTheCache(t *testing.T) {
 	var calls atomic.Int32
 	src := liveSource(t, time.Hour, func(w http.ResponseWriter, r *http.Request) {
 		calls.Add(1)
-		w.Write([]byte(`{"data":{"sets":[{"id":"base1","name":"Base Set","releaseDate":"1999-01-09","serie":{"name":"Base"},"cardCount":{"official":102,"total":102}}]}}`))
+		if isDetail(r) {
+			w.Write([]byte(base1SetDetail))
+			return
+		}
+		w.Write([]byte(base1SetList))
 	})
 
 	if err := src.WarmSets(context.Background(), LangEN); err != nil {
@@ -192,10 +229,12 @@ func TestWarmSetsPopulatesTheCache(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Set: %v", err)
 	}
-	if got.Name != "Base Set" {
+	if got.Name != "Base Set" || got.ReleaseDate.String() != "1999-01-09" || got.Series != "Base" {
 		t.Errorf("set = %+v", got)
 	}
-	if n := calls.Load(); n != 1 {
-		t.Errorf("made %d upstream calls, want 1", n)
+	// The list plus one detail, and nothing more: Set must have been served from
+	// the warmed cache rather than refetched.
+	if n := calls.Load(); n != 2 {
+		t.Errorf("made %d upstream calls, want 2", n)
 	}
 }

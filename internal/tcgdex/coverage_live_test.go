@@ -10,6 +10,15 @@ import (
 	"time"
 )
 
+// The corpus-wide queries this test needs. Both lean on REST filters rather than
+// downloading every card and counting locally: `category=eq:Pokemon` narrows to
+// cards that ought to carry a Dex number, and `dexId=null:` picks out the ones
+// that do not.
+const (
+	pathAllPokemon      = "/en/cards?category=eq:Pokemon"
+	pathUntaggedPokemon = "/en/cards?category=eq:Pokemon&dexId=null:"
+)
+
 // Cards are attributed to a Pokémon by their dexId, so a Pokémon card the source
 // has not tagged with one is invisible to us — it cannot appear in any list, and
 // a collector would never know it was missing.
@@ -25,38 +34,30 @@ func TestUntaggedPokemonCardsStaySmall(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 
-	var resp struct {
-		Cards []struct {
-			ID       string `json:"id"`
-			Category string `json:"category"`
-			DexID    []int  `json:"dexId"`
-		} `json:"cards"`
+	var all, missing []briefRef
+	if err := c.get(ctx, pathAllPokemon, &all); err != nil {
+		t.Fatalf("counting Pokémon cards: %v", err)
 	}
-	if err := c.graphQL(ctx, `{ cards { id category dexId } }`, nil, &resp); err != nil {
-		t.Fatalf("fetching the corpus: %v", err)
+	if err := c.get(ctx, pathUntaggedPokemon, &missing); err != nil {
+		t.Fatalf("counting untagged Pokémon cards: %v", err)
 	}
 
-	var pokemon, untagged int
-	bySet := map[string]int{}
-	for _, card := range resp.Cards {
-		if card.Category != "Pokemon" {
-			continue
-		}
-		pokemon++
-		if len(card.DexID) == 0 {
-			untagged++
-			bySet[setIDOf(card.ID)]++
-		}
-	}
-
+	pokemon, untagged := len(all), len(missing)
 	if pokemon == 0 {
-		t.Fatal("no Pokémon cards returned")
+		// An empty list here is far more likely to be a filter the API stopped
+		// recognising than a corpus with no Pokémon in it: an unknown query
+		// parameter is treated as a filter matching nothing, so a renamed one fails
+		// as a silent zero. Zero would also sail past the threshold below.
+		t.Fatalf("no Pokémon cards returned for %s — has the filter syntax changed?", pathAllPokemon)
 	}
 
+	bySet := map[string]int{}
+	for _, card := range missing {
+		bySet[setIDOf(card.ID)]++
+	}
 	sets := make([]string, 0, len(bySet))
-	for id, n := range bySet {
+	for id := range bySet {
 		sets = append(sets, id)
-		_ = n
 	}
 	sort.Strings(sets)
 

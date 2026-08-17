@@ -68,11 +68,19 @@ deliberately exclude — read it before changing how printings are expanded.
 Data comes from [TCGdex](https://tcgdex.dev), fetched live and cached in memory, so a newly released
 set shows up without a redeploy.
 
-- English uses the GraphQL endpoint: one request per Pokémon.
-- Japanese uses REST, because GraphQL is English-only — it ignores `Accept-Language` and there is no
-  `/v2/ja/graphql`. That costs one request per card, bounded at 8 in flight.
-- Set release dates are never returned alongside a card on either transport, so the set index is
-  fetched separately and joined by set ID. `main.go` warms the English index at startup.
+- Only the [REST API](https://tcgdex.dev/rest/cards) is used, for every language. TCGdex also has a
+  GraphQL endpoint, but it is English-only — it ignores `Accept-Language` and there is no
+  `/v2/ja/graphql` — so using it meant two code paths that had to agree about which cards exist. They
+  return the same corpus, so the second one bought nothing but a place to drift.
+- The list endpoints return a trimmed shape and REST has no field selection, so a Pokémon costs one
+  list request plus one detail request per card, bounded at 16 in flight. Roughly a second for the
+  largest list (Pikachu, ~200 cards), then cached.
+- Cards are attributed by `dexId`, filtered with strict equality (`dexId=eq:6`). The API's default
+  laxist filter matches as a *substring*, so a bare `dexId=6` would also return dex 16, 60 and 106.
+- Unrecognised query parameters are treated as filters matching nothing, so a mistyped one returns
+  `[]` rather than an error. Build query strings from checked constants.
+- Set release dates are never returned alongside a card, so the set index is fetched separately and
+  joined by set ID. `main.go` warms the English index at startup.
 
 `PKMN_CACHE_TTL` (a Go duration, default `24h`) controls how long a fetched list is reused. Set
 metadata never expires — a set's name and release date are fixed once it has shipped.

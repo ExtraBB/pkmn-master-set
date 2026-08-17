@@ -1,20 +1,27 @@
-// Package tcgdex is a read-only client for the tcgdex.net Pokémon TCG API.
+// Package tcgdex is a read-only client for the tcgdex.net REST API
+// (https://tcgdex.dev/rest/cards).
 //
-// The API exposes the same corpus through two transports with different
-// capabilities, and this package hides the difference:
+// REST is the only transport used, for every language. The API also exposes a
+// GraphQL endpoint, but it is English-only — it ignores Accept-Language and
+// /v2/ja/graphql does not exist — so relying on it meant maintaining two code
+// paths that had to be kept in agreement about which cards exist. They returned
+// the same corpus, so the second path bought nothing but a place for the two to
+// drift.
 //
-//   - GraphQL (POST /v2/graphql) is English-only. It ignores Accept-Language and
-//     /v2/ja/graphql does not exist. In exchange it answers a whole Pokémon in one
-//     request, so it is the fast path for English.
-//   - REST (/v2/{lang}/...) is localised but has no field selection, so a Pokémon
-//     costs one list request plus one detail request per card.
+// The cost of REST-only is that the list endpoints return a trimmed shape with no
+// field selection, so a Pokémon is one list request plus one detail request per
+// card, fanned out by forEach. Callers are expected to cache.
 //
-// Neither transport returns a set's release date alongside a card, so sets are
-// always fetched separately and joined by set ID by the caller.
+// Two REST behaviours shape the code below:
+//
+//   - A card response's nested set object carries a null releaseDate, so sets are
+//     always fetched separately and joined by set ID by the caller.
+//   - Unrecognised query parameters are treated as filters that match nothing,
+//     so a mistyped parameter yields an empty list rather than an error. Every
+//     query string here is built from a checked constant for that reason.
 package tcgdex
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -34,24 +41,17 @@ const (
 	defaultUserAgent = "pkmn-master-set/0.1 (+github.com/ExtraBB/pkmn-master-set)"
 	defaultTimeout   = 30 * time.Second
 
-	// detailConcurrency bounds the fan-out when a language has to be fetched
-	// card-by-card over REST. High enough to keep a cold Japanese lookup snappy,
-	// low enough to stay a polite client.
-	detailConcurrency = 8
+	// detailConcurrency bounds the card-by-card fan-out. Every language pays it
+	// now, including English, so it is sized against the largest list in the
+	// corpus: Pikachu's ~200 cards take about a second at 16 and two and a half at
+	// 8. Still a polite number of connections to hold open against one host.
+	detailConcurrency = 16
 
 	maxAttempts = 3
 )
 
 // ErrNotFound is returned when the API reports a resource does not exist.
 var ErrNotFound = errors.New("tcgdex: not found")
-
-// GraphQLError reports errors returned in a 200 response body. The GraphQL
-// endpoint signals failure this way, so a 200 alone never means success.
-type GraphQLError struct{ Messages []string }
-
-func (e *GraphQLError) Error() string {
-	return "tcgdex: graphql: " + strings.Join(e.Messages, "; ")
-}
 
 // Client is safe for concurrent use.
 type Client struct {
@@ -98,22 +98,13 @@ func defaultBackoff(attempt int) time.Duration {
 
 // Sets returns the full set index for a language, including release dates.
 //
-// This is the only place release dates are available: the set object nested
-// inside a card response carries a null releaseDate on both transports.
+// Set details are the only place release dates are available: the set object
+// nested inside a card response carries a null releaseDate.
+//
+// The set list is a brief shape without release dates, so each set has to be read
+// individually — a couple of hundred requests. Callers should treat this as a
+// one-off warm-up, not a per-request cost.
 func (c *Client) Sets(ctx context.Context, lang string) ([]Set, error) {
-	if lang == langEN {
-		var resp struct {
-			Sets []restSet `json:"sets"`
-		}
-		if err := c.graphQL(ctx, querySets, nil, &resp); err != nil {
-			return nil, err
-		}
-		return toSets(resp.Sets), nil
-	}
-
-	// The REST set list is a brief shape without release dates, so each set has
-	// to be read individually. Callers should treat this as a warm-up, not a
-	// per-request cost.
 	var brief []briefRef
 	if err := c.get(ctx, "/"+lang+"/sets", &brief); err != nil {
 		return nil, err
@@ -145,49 +136,16 @@ func (c *Client) SetDetail(ctx context.Context, lang, setID string) (Set, error)
 
 // CardsByDex returns every card in a language whose dexId array contains dexID.
 //
-// Because dexId is an array, cards featuring two Pokémon (Pikachu & Zekrom GX is
-// dexId [25, 644]) are returned for both — which is the attribution rule this
-// product wants.
+// The filter is strict equality (`dexId=eq:N`) rather than the API's default laxist
+// match, which compares as a substring: `dexId=25` also returns dex 125 and 250.
+// Because dexId is an array, strict equality still matches any element, so cards
+// featuring two Pokémon (Pikachu & Zekrom GX is dexId [25, 644]) are returned for
+// both — which is the attribution rule this product wants.
+//
+// A card the source has not tagged with a dexId cannot be reached by any query
+// here and so appears in nobody's list. That blind spot is measured by
+// TestUntaggedPokemonCardsStaySmall rather than papered over.
 func (c *Client) CardsByDex(ctx context.Context, lang string, dexID int) ([]Card, error) {
-	if lang == langEN {
-		return c.cardsByDexGraphQL(ctx, dexID)
-	}
-	return c.cardsByDexREST(ctx, lang, dexID)
-}
-
-const langEN = "en"
-
-const querySets = `{ sets { id name releaseDate serie { name } cardCount { official total } } }`
-
-const queryCardsByDex = `query($dexId: Int!) {
-  cards(filters: {dexId: $dexId}) {
-    id
-    localId
-    name
-    rarity
-    illustrator
-    image
-    variants_detailed { type subtype stamp size }
-    set { id name cardCount { official total } }
-  }
-}`
-
-func (c *Client) cardsByDexGraphQL(ctx context.Context, dexID int) ([]Card, error) {
-	var resp struct {
-		Cards []restCard `json:"cards"`
-	}
-	vars := map[string]any{"dexId": dexID}
-	if err := c.graphQL(ctx, queryCardsByDex, vars, &resp); err != nil {
-		return nil, err
-	}
-	out := make([]Card, len(resp.Cards))
-	for i, rc := range resp.Cards {
-		out[i] = rc.toCard()
-	}
-	return out, nil
-}
-
-func (c *Client) cardsByDexREST(ctx context.Context, lang string, dexID int) ([]Card, error) {
 	var brief []briefRef
 	path := "/" + lang + "/cards?dexId=eq:" + strconv.Itoa(dexID)
 	if err := c.get(ctx, path, &brief); err != nil {
@@ -262,14 +220,6 @@ func (c *Client) forEach(ctx context.Context, n int, fn func(context.Context, in
 	return firstErr
 }
 
-func toSets(in []restSet) []Set {
-	out := make([]Set, len(in))
-	for i, s := range in {
-		out[i] = s.toSet()
-	}
-	return out
-}
-
 // ---- transport ----
 
 func (c *Client) get(ctx context.Context, path string, out any) error {
@@ -282,46 +232,6 @@ func (c *Client) get(ctx context.Context, path string, out any) error {
 		return req, nil
 	}, func(body []byte) error {
 		return json.Unmarshal(body, out)
-	})
-}
-
-func (c *Client) graphQL(ctx context.Context, query string, vars map[string]any, out any) error {
-	payload, err := json.Marshal(map[string]any{"query": query, "variables": vars})
-	if err != nil {
-		return err
-	}
-
-	return c.do(ctx, func() (*http.Request, error) {
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/graphql", bytes.NewReader(payload))
-		if err != nil {
-			return nil, err
-		}
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Accept", "application/json")
-		return req, nil
-	}, func(body []byte) error {
-		var env struct {
-			Data   json.RawMessage `json:"data"`
-			Errors []struct {
-				Message string `json:"message"`
-			} `json:"errors"`
-		}
-		if err := json.Unmarshal(body, &env); err != nil {
-			return err
-		}
-		// GraphQL reports failure inside a 200 response, so this check must come
-		// before decoding data.
-		if len(env.Errors) > 0 {
-			msgs := make([]string, len(env.Errors))
-			for i, e := range env.Errors {
-				msgs[i] = e.Message
-			}
-			return &GraphQLError{Messages: msgs}
-		}
-		if len(env.Data) == 0 {
-			return errors.New("tcgdex: graphql response had no data")
-		}
-		return json.Unmarshal(env.Data, out)
 	})
 }
 
