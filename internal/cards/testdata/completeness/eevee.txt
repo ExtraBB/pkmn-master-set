@@ -6,6 +6,9 @@
 # KNOWN UPSTREAM GAPS (in Bulbapedia, absent from TCGdex entirely):
 #   xya 101a           - Yellow A Alternate; TCGdex's xya set has no Eevee
 #   30th Celebration   - 116, 117, 118; set absent from TCGdex
+#
+# Pokemon TCG Pocket (serie "tcgp") cards are deliberately absent: they are
+# digital-only, have no physical printing, and are excluded from every result.
 
 base2 51	# Jungle Eevee
 basep 11	# Wizards Black Star Promos Eevee
@@ -90,25 +93,8 @@ sv06 135	# Twilight Masquerade Eevee
 sv06 188	# Twilight Masquerade Eevee
 sv06.5 050	# Shrouded Fable Eevee
 sv07 113	# Stellar Crown Eevee
-A1 206	# Genetic Apex Eevee
-A1 207	# Genetic Apex Eevee
-A1 208	# Genetic Apex Eevee
-A1 248	# Genetic Apex Eevee
-P-A 030	# Promos-A Eevee
-P-A 092	# Promos-A Eevee
 sv08 143	# Surging Sparks Eevee
 2024sv 13	# McDonald's Collection 2024 Eevee
-A1a 061	# Mythical Island Eevee
 sv08.5 074	# Prismatic Evolutions Eevee
 sv08.5 075	# Prismatic Evolutions Eevee ex
 sv08.5 167	# Prismatic Evolutions Eevee ex
-A2 126	# Space-Time Smackdown Eevee
-A2a 062	# Triumphant Light Eevee
-A3b 055	# Eevee Grove Eevee
-A3b 056	# Eevee Grove Eevee ex
-A3b 078	# Eevee Grove Eevee
-A3b 083	# Eevee Grove Eevee ex
-A3b 092	# Eevee Grove Eevee ex
-A4 134	# Wisdom of Sea and Sky Eevee
-A4 231	# Wisdom of Sea and Sky Eevee
-B1 184	# Mega Rising Eevee

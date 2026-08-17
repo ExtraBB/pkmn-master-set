@@ -83,8 +83,12 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 // Set is a card set. ReleaseDate drives the chronological ordering that makes a
 // filled binder read as the Pokémon's history, front to back.
 type Set struct {
-	ID            string `json:"id"`
-	Name          string `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	// SeriesID is the source's own serie id ("base", "swsh", "tcgp", …). It is
+	// what ExcludedSeries matches on, because it is stable where the display name
+	// is not.
+	SeriesID      string `json:"seriesId"`
 	Series        string `json:"series"`
 	ReleaseDate   Date   `json:"releaseDate"`
 	CountOfficial int    `json:"countOfficial"`

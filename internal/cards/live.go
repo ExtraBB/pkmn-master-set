@@ -151,6 +151,7 @@ func (s *LiveSource) Set(ctx context.Context, lang Language, setID string) (Set,
 	set := Set{
 		ID:            raw.ID,
 		Name:          raw.Name,
+		SeriesID:      raw.SeriesID,
 		Series:        raw.Series,
 		ReleaseDate:   date,
 		CountOfficial: raw.CountOfficial,
@@ -176,6 +177,7 @@ func (s *LiveSource) WarmSets(ctx context.Context, lang Language) error {
 		s.sets[cacheKey{lang, r.ID}] = Set{
 			ID:            r.ID,
 			Name:          r.Name,
+			SeriesID:      r.SeriesID,
 			Series:        r.Series,
 			ReleaseDate:   date,
 			CountOfficial: r.CountOfficial,

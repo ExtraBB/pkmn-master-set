@@ -25,6 +25,11 @@ type Source interface {
 	Set(ctx context.Context, lang Language, setID string) (Set, error)
 }
 
+// excludedSeries are serie IDs whose sets are dropped from every result. "tcgp"
+// is Pokémon TCG Pocket: a digital-only game whose cards have no physical
+// printing, so they can never go in a binder and would only pad the page count.
+var excludedSeries = map[string]bool{"tcgp": true}
+
 // Catalog answers product questions about a Pokémon's card list.
 type Catalog struct {
 	src     Source
@@ -100,8 +105,14 @@ func (c *Catalog) Query(ctx context.Context, q Query) (Result, error) {
 
 	printings := make([]Printing, 0, len(raw))
 	variantCount := 0
+	cardCount := 0
 	for _, card := range raw {
-		rows := expand(card, sets[card.SetID], q.Language, q.IncludeVariants)
+		set := sets[card.SetID]
+		if excludedSeries[set.SeriesID] {
+			continue
+		}
+		cardCount++
+		rows := expand(card, set, q.Language, q.IncludeVariants)
 		for _, p := range rows {
 			variantCount += p.Collapsed
 		}
@@ -114,7 +125,7 @@ func (c *Catalog) Query(ctx context.Context, q Query) (Result, error) {
 		Language:        q.Language,
 		IncludeVariants: q.IncludeVariants,
 		Printings:       printings,
-		CardCount:       len(raw),
+		CardCount:       cardCount,
 		PrintingCount:   len(printings),
 		VariantCount:    variantCount,
 		FetchedAt:       time.Now(),

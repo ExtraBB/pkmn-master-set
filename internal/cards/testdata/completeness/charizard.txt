@@ -9,7 +9,10 @@
 #   003/034           - Pokemon TCG Classic (Charizard & Ho-Oh ex Deck); set not in TCGdex
 #
 # Also present here but absent from Bulbapedia's page: 2024sv 1 (McDonald's
-# Collection 2024) and the TCG Pocket sets, which Bulbapedia covers elsewhere.
+# Collection 2024).
+#
+# Pokemon TCG Pocket (serie "tcgp") cards are deliberately absent: they are
+# digital-only, have no physical printing, and are excluded from every result.
 
 base1 4	# Base Set Charizard
 base4 4	# Base Set 2 Charizard
@@ -112,15 +115,7 @@ sv03.5 183	# 151 Charizard ex
 sv03.5 199	# 151 Charizard ex
 sv04.5 054	# Paldean Fates Charizard ex
 sv04.5 234	# Paldean Fates Charizard ex
-A1 035	# Genetic Apex Charizard
-A1 036	# Genetic Apex Charizard ex
-A1 253	# Genetic Apex Charizard ex
-A1 280	# Genetic Apex Charizard ex
-A1 284	# Genetic Apex Charizard ex
 2024sv 1	# McDonald's Collection 2024 Charizard
-A2b 010	# Shining Revelry Charizard ex
-A2b 080	# Shining Revelry Charizard ex
-A2b 108	# Shining Revelry Charizard ex
 mep 023	# MEP Black Star Promos Mega Charizard X ex
 mep 029	# MEP Black Star Promos Mega Charizard X ex
 mep 030	# MEP Black Star Promos Mega Charizard Y ex
@@ -128,10 +123,5 @@ me02 013	# Phantasmal Flames Mega Charizard X ex
 me02 109	# Phantasmal Flames Mega Charizard X ex
 me02 125	# Phantasmal Flames Mega Charizard X ex
 me02 130	# Phantasmal Flames Mega Charizard X ex
-B1a 013	# Crimson Blaze Charizard
-B1a 014	# Crimson Blaze Mega Charizard Y ex
-B1a 077	# Crimson Blaze Mega Charizard Y ex
-B1a 087	# Crimson Blaze Mega Charizard Y ex
-B1a 091	# Crimson Blaze Charizard
 me02.5 022	# Ascended Heroes Mega Charizard Y ex
 me02.5 294	# Ascended Heroes Mega Charizard Y ex

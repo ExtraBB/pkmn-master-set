@@ -294,6 +294,34 @@ func TestUnresolvableSetStillYieldsPrintings(t *testing.T) {
 	}
 }
 
+// Pokémon TCG Pocket cards exist only in a phone app, so a collector can never
+// put one in a binder: they must not appear as rows, and must not inflate the
+// counts the preview reports.
+func TestQuerySkipsDigitalOnlySeries(t *testing.T) {
+	src := charizardFixture(t)
+	src.sets["A1"] = Set{ID: "A1", Name: "Genetic Apex", SeriesID: "tcgp", Series: "Pokémon TCG Pocket", ReleaseDate: mustDate(t, "2024-10-30"), CountOfficial: 226}
+	src.cards[LangEN] = append(src.cards[LangEN], Card{
+		ID: "A1-36", Name: "Charizard", Number: "36", DexIDs: []int{6},
+		SetID: "A1", SetName: "Genetic Apex", SetTotal: 226,
+		Variants: []Variant{{Type: "holo", Size: "standard"}},
+	})
+
+	got, err := testCatalog(t, src).Query(context.Background(), Query{DexID: 6, Language: LangEN, IncludeVariants: true})
+	if err != nil {
+		t.Fatalf("Query: %v", err)
+	}
+	for _, p := range got.Printings {
+		if p.SetID == "A1" {
+			t.Fatalf("tcgp printing survived: %+v", p)
+		}
+	}
+	// The three fixture cards and their five printings, with the Pocket card
+	// counted nowhere.
+	if got.CardCount != 3 || got.PrintingCount != 5 || got.VariantCount != 5 {
+		t.Errorf("counts = %d cards / %d printings / %d variants, want 3/5/5", got.CardCount, got.PrintingCount, got.VariantCount)
+	}
+}
+
 func describe(ps []Printing) []string {
 	out := make([]string, len(ps))
 	for i, p := range ps {

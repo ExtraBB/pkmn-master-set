@@ -9,6 +9,9 @@
 #
 # Also present here but absent from Bulbapedia's page: 2024sv 9 (McDonald's
 # Collection 2024 Umbreon).
+#
+# Pokemon TCG Pocket (serie "tcgp") cards are deliberately absent: they are
+# digital-only, have no physical printing, and are excluded from every result.
 
 neo2 13	# Neo Discovery Umbreon
 neo2 32	# Neo Discovery Umbreon
@@ -56,9 +59,3 @@ sv03 130	# Obsidian Flames Umbreon
 sv08.5 059	# Prismatic Evolutions Umbreon
 sv08.5 060	# Prismatic Evolutions Umbreon ex
 sv08.5 161	# Prismatic Evolutions Umbreon ex
-A3b 043	# Eevee Grove Umbreon
-A3b 077	# Eevee Grove Umbreon
-A4 112	# Wisdom of Sea and Sky Umbreon ex
-A4 193	# Wisdom of Sea and Sky Umbreon ex
-A4 208	# Wisdom of Sea and Sky Umbreon ex
-B2 231	# Fantastical Parade Umbreon ex

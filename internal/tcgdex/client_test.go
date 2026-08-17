@@ -360,10 +360,10 @@ func TestSetsReadsEveryDetailForReleaseDates(t *testing.T) {
 					w.Write([]byte(`[{"id":"base1","name":"Base Set","cardCount":{"official":102,"total":102}},
 					                 {"id":"basep","name":"Wizards Black Star Promos","cardCount":{"official":53,"total":53}}]`))
 				case "/" + lang + "/sets/base1":
-					w.Write([]byte(`{"id":"base1","name":"Base Set","releaseDate":"1999-01-09","serie":{"name":"Base"},"cardCount":{"official":102,"total":102}}`))
+					w.Write([]byte(`{"id":"base1","name":"Base Set","releaseDate":"1999-01-09","serie":{"id":"base","name":"Base"},"cardCount":{"official":102,"total":102}}`))
 				default:
 					// A promo set with no known release date is a real state, not a fault.
-					w.Write([]byte(`{"id":"basep","name":"Wizards Black Star Promos","serie":{"name":"Base"},"cardCount":{"official":53,"total":53}}`))
+					w.Write([]byte(`{"id":"basep","name":"Wizards Black Star Promos","serie":{"id":"base","name":"Base"},"cardCount":{"official":53,"total":53}}`))
 				}
 			})
 
@@ -374,7 +374,7 @@ func TestSetsReadsEveryDetailForReleaseDates(t *testing.T) {
 			if len(got) != 2 {
 				t.Fatalf("got %d sets, want 2", len(got))
 			}
-			if got[0].ReleaseDate != "1999-01-09" || got[0].Series != "Base" || got[0].CountOfficial != 102 {
+			if got[0].ReleaseDate != "1999-01-09" || got[0].Series != "Base" || got[0].SeriesID != "base" || got[0].CountOfficial != 102 {
 				t.Errorf("sets[0] = %+v", got[0])
 			}
 			if got[1].ReleaseDate != "" {

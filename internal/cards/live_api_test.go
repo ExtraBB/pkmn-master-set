@@ -48,12 +48,14 @@ func TestLiveCardCountFloors(t *testing.T) {
 		minPrints int
 	}{
 		// Measured 2026-08-17, with a few per cent of headroom so ordinary
-		// source churn never turns this red — only a real loss does.
-		{6, "Charizard", LangEN, 124, 145},
-		{25, "Pikachu", LangEN, 206, 280},
-		{133, "Eevee", LangEN, 105, 138},
-		{150, "Mewtwo", LangEN, 92, 112},
-		{197, "Umbreon", LangEN, 52, 65},
+		// source churn never turns this red — only a real loss does. Re-measured
+		// the same day once the digital-only TCG Pocket series was excluded, which
+		// took roughly a tenth off every English list.
+		{6, "Charizard", LangEN, 106, 130},
+		{25, "Pikachu", LangEN, 182, 259},
+		{133, "Eevee", LangEN, 84, 120},
+		{150, "Mewtwo", LangEN, 81, 103},
+		{197, "Umbreon", LangEN, 44, 59},
 		{6, "Charizard", LangJA, 25, 32},
 	}
 

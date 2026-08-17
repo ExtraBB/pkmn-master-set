@@ -13,6 +13,9 @@
 #   30th Celebration   - 157; set absent from TCGdex
 #   014/034            - Pokemon TCG Classic (Blastoise & Suicune ex Deck)
 #   S4/S4              - Legendary Collection box topper
+#
+# Pokemon TCG Pocket (serie "tcgp") cards are deliberately absent: they are
+# digital-only, have no physical printing, and are excluded from every result.
 
 base1 10	# Base Set Mewtwo
 basep 3	# Wizards Black Star Promos Mewtwo
@@ -95,13 +98,6 @@ svp 216	# SVP Black Star Promos Team Rocket's Mewtwo ex
 sv03.5 150	# 151 Mewtwo
 sv04 058	# Paradox Rift Mewtwo ex
 sv07 059	# Stellar Crown Mewtwo
-A1 128	# Genetic Apex Mewtwo
-A1 129	# Genetic Apex Mewtwo ex
-A1 262	# Genetic Apex Mewtwo ex
-A1 282	# Genetic Apex Mewtwo ex
-A1 286	# Genetic Apex Mewtwo ex
-P-A 010	# Promos-A Mewtwo
-P-A 050	# Promos-A Mewtwo ex
 sv10 081	# Destined Rivals Team Rocket's Mewtwo ex
 sv10 213	# Destined Rivals Team Rocket's Mewtwo ex
 sv10 231	# Destined Rivals Team Rocket's Mewtwo ex

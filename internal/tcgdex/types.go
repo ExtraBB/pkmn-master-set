@@ -7,8 +7,12 @@ import "encoding/json"
 
 // Set is a tcgdex set. ReleaseDate is empty for a handful of promo sets.
 type Set struct {
-	ID            string
-	Name          string
+	ID   string
+	Name string
+	// SeriesID is the serie's own id ("base", "swsh", "tcgp", …), which is stable
+	// across languages in a way the display name is not, so it is what callers
+	// filter on.
+	SeriesID      string
 	Series        string
 	ReleaseDate   string // "YYYY-MM-DD", or "" when unknown
 	CountOfficial int
@@ -93,6 +97,7 @@ type restSet struct {
 	Name        string `json:"name"`
 	ReleaseDate string `json:"releaseDate"`
 	Serie       struct {
+		ID   string `json:"id"`
 		Name string `json:"name"`
 	} `json:"serie"`
 	CardCount struct {
@@ -216,6 +221,7 @@ func (s restSet) toSet() Set {
 	return Set{
 		ID:            s.ID,
 		Name:          s.Name,
+		SeriesID:      s.Serie.ID,
 		Series:        s.Serie.Name,
 		ReleaseDate:   s.ReleaseDate,
 		CountOfficial: s.CardCount.Official,

@@ -11,6 +11,9 @@
 #                        149, 150; set absent from TCGdex
 #   008/034            - Pokemon TCG Classic (Charizard & Ho-Oh ex Deck)
 #   Raid Battle 01     - Pikachu VMAX; set not in TCGdex
+#
+# Pokemon TCG Pocket (serie "tcgp") cards are deliberately absent: they are
+# digital-only, have no physical printing, and are excluded from every result.
 
 base1 58	# Base Set Pikachu
 base2 60	# Jungle Pikachu
@@ -191,29 +194,13 @@ mfb 17	# My First Battle Pikachu
 sv04.5 018	# Paldean Fates Pikachu
 sv04.5 131	# Paldean Fates Pikachu
 sv05 051	# Temporal Forces Pikachu
-A1 094	# Genetic Apex Pikachu
-A1 096	# Genetic Apex Pikachu ex
-A1 259	# Genetic Apex Pikachu ex
-A1 281	# Genetic Apex Pikachu ex
-A1 285	# Genetic Apex Pikachu ex
-P-A 009	# Promos-A Pikachu
-P-A 015	# Promos-A Pikachu
-P-A 026	# Promos-A Pikachu
 sv08 057	# Surging Sparks Pikachu ex
 sv08 219	# Surging Sparks Pikachu ex
 sv08 238	# Surging Sparks Pikachu ex
 sv08 247	# Surging Sparks Pikachu ex
 2024sv 2	# McDonald's Collection 2024 Pikachu
-A1a 025	# Mythical Island Pikachu
 sv08.5 028	# Prismatic Evolutions Pikachu ex
 sv08.5 179	# Prismatic Evolutions Pikachu ex
-A2a 025	# Triumphant Light Pikachu
-A2b 022	# Shining Revelry Pikachu ex
-A2b 082	# Shining Revelry Pikachu ex
-A2b 092	# Shining Revelry Pikachu ex
-A3 057	# Celestial Guardians Pikachu
-B1 321	# Mega Rising Pikachu ex
-B2 049	# Fantastical Parade Pikachu
 me02.5 055	# Ascended Heroes Pikachu
 me02.5 057	# Ascended Heroes Pikachu ex
 me02.5 276	# Ascended Heroes Pikachu ex

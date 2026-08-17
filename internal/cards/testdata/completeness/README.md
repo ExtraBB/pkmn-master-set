@@ -20,6 +20,10 @@ in our generated list:
 go test -tags=live -run TestCompleteness ./internal/cards/
 ```
 
+Pokémon TCG Pocket sets (TCGdex serie `tcgp`: `A1`, `A2b`, `B1a`, `P-A`, …) must **not** appear in
+these files. Those cards are digital-only and the catalog excludes the whole serie, so a `tcgp` line
+here is a guaranteed failure rather than a real gap.
+
 It is a **subset** check. Extra cards in our list are fine — these references are transcribed by hand
 and lag new sets. A card the reference has and we don't is the failure worth catching.
 
