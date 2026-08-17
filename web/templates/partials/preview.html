@@ -38,7 +38,8 @@
 {{/* Options are real links, so every state of the list has a URL you can share. */}}
 {{define "options"}}
 <div class="options">
-  <div class="option option-language">
+  <!-- hidden because japanese support is poor currently -->
+  <!-- <div class="option option-language">
     <span class="option-label">Language</span>
     <span class="segmented">
       <a class="segment{{if not .IsJapanese}} is-active{{end}}" href="{{.EnglishURL}}"
@@ -48,7 +49,7 @@
          hx-get="{{.JapaneseURL}}" hx-target="#preview" hx-swap="outerHTML" hx-push-url="true"
          {{if .IsJapanese}}aria-current="true"{{end}}>日本語</a>
     </span>
-  </div>
+  </div> -->
   <div class="option option-variants">
     {{- if .Result.IncludeVariants}}
       <a class="switch is-on" href="{{.VariantsOffURL}}" role="switch" aria-checked="true"

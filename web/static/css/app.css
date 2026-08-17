@@ -383,7 +383,8 @@ main {
 }
 
 .suggestion-list a:hover,
-.suggestion-list a:focus-visible {
+.suggestion-list a:focus-visible,
+.suggestion-list li.is-active a {
   background: var(--action-tint);
   text-decoration: none;
 }
