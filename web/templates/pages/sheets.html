@@ -1,0 +1,132 @@
+{{/*
+  The printable sheet — the core output.
+
+  This page is deliberately standalone: no site layout, no header, no htmx, no
+  dark palette. It is a physical artifact in waiting, and everything on it either
+  gets cut out or tells you whether the print came out at the right size.
+*/}}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Species.Name}} — printable placeholders</title>
+{{/* A sheet is not for search engines, and a half-cut binder page is not a
+     landing page. */}}
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/static/css/print.css">
+</head>
+<body class="art-{{.Art}}">
+
+{{/* The banner is screen-only: instructions live where the user is standing when
+     they press print, not on the paper they are about to cut. */}}
+<div class="banner" role="region" aria-label="Print settings">
+  <div class="banner-main">
+    <p class="banner-title">Print at 100% — turn off “fit to page”</p>
+    <p class="banner-body">
+      Scaling is the one thing that ruins a whole stack of cut-outs, and you only find out after
+      cutting. Every sheet carries a 50 mm reference strip down the left edge:
+      <strong>print one page, measure the strip, then print the rest.</strong>
+      These sheets are laid out for <strong>A4</strong>, and print cards at 63 × 88 mm.
+    </p>
+  </div>
+
+  <div class="banner-controls">
+    <form class="art-picker" method="get" action="/download/{{.Slug}}/sheets">
+      {{- if .IsJapanese}}<input type="hidden" name="lang" value="ja">{{end}}
+      {{- if not .Result.IncludeVariants}}<input type="hidden" name="variants" value="0">{{end}}
+      <label for="art">Placeholder art</label>
+      <select id="art" name="art">
+        <option value="grey" {{if .IsGrey}}selected{{end}}>Greyed out — a gap looks like a gap</option>
+        <option value="colour" {{if .IsColour}}selected{{end}}>Full colour</option>
+        <option value="outline" {{if .IsOutline}}selected{{end}}>Outline only — no art, less ink</option>
+      </select>
+      <button class="btn btn-outline" type="submit">Apply</button>
+    </form>
+    <div class="banner-actions">
+      <a class="btn btn-outline" href="{{.BackURL}}">Back to the list</a>
+      <button class="btn btn-accent" type="button" id="print">Print</button>
+    </div>
+  </div>
+
+  <p class="banner-count">
+    {{.Result.PrintingCount}} {{plural .Result.PrintingCount "placeholder" "placeholders"}} ·
+    {{.Result.SheetPages}} {{plural .Result.SheetPages "page" "pages"}} ·
+    {{.Species.Name}}, chronological by set release
+  </p>
+</div>
+
+{{if .Result.Printings}}
+{{- $species := .Species.Name -}}
+{{- $outline := .IsOutline -}}
+{{- range $page := .Pages}}
+<section class="sheet">
+  {{/* The scale check, on every page rather than on a cover sheet: a page
+       reprinted on its own has to be verifiable on its own. It sits in the left
+       margin because the vertical margin on US Letter is only a few millimetres —
+       there is no room for it above or below the grid. */}}
+  <div class="scale-check" aria-hidden="true">
+    <div class="ruler-strip"></div>
+    <p class="scale-note">50 mm — print at 100%, no “fit to page”</p>
+  </div>
+
+  <div class="grid">
+    {{- range $p := $page}}
+    {{- $art := "" }}{{if not $outline}}{{$art = $p.ImageURL "high" "webp"}}{{end}}
+    <div class="placeholder{{if eq $p.Variant.Size "jumbo"}} is-jumbo{{end}}">
+      {{- with $art}}
+        {{/* Never loading="lazy": an image that has not loaded because it is off
+             screen prints as a blank card. */}}
+        <img class="art" src="{{.}}" alt="" decoding="sync">
+        <div class="caption">
+          <span class="cap-set">{{$p.Display "set"}}</span>
+          {{- if ne $p.Name $species}}
+            {{/* Dark Charizard and Blaine's Charizard read as themselves. */}}
+            <span class="cap-name">{{$p.Display "name"}}</span>
+          {{- end}}
+          <span class="cap-meta">
+            {{- $p.Display "number"}}
+            {{- with $p.VariantShort}} · {{.}}{{end -}}
+          </span>
+          {{- if eq $p.Variant.Size "jumbo"}}
+            {{/* Counted, but it will not fit a pocket — said before the scissors
+                 come out rather than after. See docs/variant-taxonomy.md. */}}
+            <span class="cap-warn">Jumbo — oversized, will not fit a pocket</span>
+          {{- end}}
+        </div>
+      {{- else}}
+        {{/* Either the outline treatment, or the source has no art for this card.
+             With no picture, the caption is the only thing identifying the gap —
+             so it stops being a caption and becomes the whole card, set at a size
+             you can read while flipping past it. */}}
+        <div class="art art-blank">
+          {{/* Same order of importance as a captioned placeholder: the set is
+               what you are flipping to, the card names itself under it, and the
+               number and printing settle it in the smallest type. */}}
+          <span class="blank-set">{{$p.Display "set"}}</span>
+          <span class="blank-name">{{$p.Display "name"}}</span>
+          <span class="blank-meta">
+            {{- $p.Display "number"}}
+            {{- with $p.VariantShort}} · {{.}}{{end -}}
+          </span>
+          {{- if eq $p.Variant.Size "jumbo"}}
+            <span class="cap-warn">Jumbo — oversized, will not fit a pocket</span>
+          {{- end}}
+        </div>
+      {{- end}}
+    </div>
+    {{- end}}
+  </div>
+</section>
+{{- end}}
+{{else}}
+<div class="banner banner-empty">
+  <p class="banner-title">Nothing to print.</p>
+  <p class="banner-body">Our source records no cards for {{.Species.Name}} in
+    {{.Result.Language.Display}}. <a href="{{.BackURL}}">Back to the list</a>.</p>
+</div>
+{{end}}
+
+<script src="/static/js/print.js" defer></script>
+</body>
+</html>

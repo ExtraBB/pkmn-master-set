@@ -1,0 +1,345 @@
+/* Printable placeholder sheets.
+ *
+ * Every length that ends up on paper is written in millimetres. This file is the
+ * product's one physical artifact, and a card that measures 61 mm does not sit in
+ * a binder pocket, so `mm` here is a correctness constraint rather than a unit
+ * preference. See docs/PRD.md and issues/003-printable-sheets.md.
+ *
+ * The sheet is laid out for A4, and says so: @page { size: A4 } means the
+ * browser's print dialog opens on the right paper instead of leaving the user to
+ * notice. The geometry:
+ *
+ *   card          63 x 88 mm    the trading-card size a standard pocket takes
+ *   grid  (3 x 3) 189 x 264 mm
+ *   + ruler strip 199 mm wide
+ *
+ *   A4            210 x 297 mm  -> 4 mm page margin leaves 202 x 289 mm,
+ *                                  so 1.5 mm of side clearance and 12 mm above
+ *                                  and below the grid
+ *
+ * Printed on US Letter (216 x 279 mm) the grid still fits — it is 15 mm shorter
+ * than the paper — but the print dialog will offer to scale it, and scaling is
+ * the failure this output exists to defend against. Hence the ruler strip on
+ * every page: whatever the tray holds, the strip is the thing to measure before
+ * cutting anything.
+ */
+
+:root {
+  --ink: #001432;
+  --ink-soft: #4f6486;
+  --cut: #9aa8bd;
+  --paper: #ffffff;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #e8eff9;
+  color: var(--ink);
+  font-family: var(--font);
+  /* The greyed art, the caption band and the cut lines are the artifact, not
+     decoration. Browsers drop backgrounds and filters when printing unless told
+     otherwise, and a sheet with no cut lines cannot be cut. */
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+/* ---- the sheet ---- */
+
+/* One A4 page of content: 288 rather than the full 289 mm the margins leave, so
+   a rounding error can never spill a blank page out of the printer. */
+.sheet {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  width: 199mm;
+  height: 288mm;
+  margin: 0 auto;
+  background: var(--paper);
+}
+
+/* Every sheet but the last starts a new page. Breaking after the last one too
+   would push a blank sheet out of the printer on every single job. */
+.sheet { break-after: page; page-break-after: always; }
+.sheet:last-of-type { break-after: auto; page-break-after: auto; }
+
+/* ---- the scale check ---- */
+
+/* Real millimetres: at 100% scale this strip measures 50 mm on paper, which is
+   what makes it a check rather than a decoration. */
+.scale-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 1mm;
+  width: 7mm;
+  height: 264mm;
+  color: var(--ink-soft);
+}
+
+.ruler-strip {
+  width: 3mm;
+  height: 50mm;
+  border: 0.2mm solid currentcolor;
+  border-left: 0;
+  background: repeating-linear-gradient(to bottom, currentcolor 0 0.2mm, transparent 0.2mm 5mm);
+}
+
+.scale-note {
+  margin: 0;
+  writing-mode: vertical-rl;
+  font-size: 6.5pt;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* ---- the grid ---- */
+
+/* Cards abut with no gutter, so one cut produces two edges and nothing has to be
+   trimmed twice. The cut line is an outline rather than a border: an outline is
+   drawn outside the box without taking a share of it, so the card stays exactly
+   63 x 88 mm no matter how the line is styled. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 63mm);
+  grid-auto-rows: 88mm;
+  width: 189mm;
+}
+
+/* The cut-out is a column: art above, caption below. The caption gets its own
+   band rather than sitting on top of the art, because a legend printed over a
+   picture is the first thing to become unreadable on a cheap inkjet — and the
+   caption is what answers "which card is missing here?" when the art alone is
+   not enough. */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  width: 63mm;
+  height: 88mm;
+  overflow: hidden;
+  outline: 0.15mm solid var(--cut);
+  background: var(--paper);
+}
+
+/* The art takes whatever the caption leaves and is centred in it. `contain`
+   keeps the card's proportions, so a smaller picture of a card still reads as a
+   card rather than a stretched one. */
+.art {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 1.5mm 1.5mm 0;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* The greyed default: a gap in a binder should read as a gap while you flip past
+   it, and a washed-out placeholder is not a full-quality reproduction of a card
+   at card size. */
+.art-grey .art { filter: grayscale(1) contrast(0.78) brightness(1.22); }
+
+/* No art: either the outline treatment, or a card our source has no image for.
+   The placeholder carries the same fields as a captioned one, but set at reading
+   size and given the whole cut-out — with no picture, the words are the only
+   thing that identifies the gap while you flip past it. */
+.art-blank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5mm;
+  padding: 4mm;
+  /* Inset from the cut line, so the dashes are never mistaken for where to cut. */
+  margin: 1.5mm;
+  width: auto;
+  text-align: center;
+  border: 0.3mm dashed var(--cut);
+}
+
+.art-blank span { display: block; }
+
+.blank-set {
+  font-size: 13pt;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.blank-name {
+  font-size: 10pt;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.blank-meta {
+  font-size: 8.5pt;
+  line-height: 1.2;
+  color: var(--ink-soft);
+}
+
+/* ---- the caption ---- */
+
+/* Set, number and printing — the minimum that answers "which card is missing
+   here?". A band of its own at the foot of the cut-out, on paper rather than on
+   the picture, and centred because the art above it is. */
+.caption {
+  flex: none;
+  padding: 1.2mm 2mm 1.8mm;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.caption span { display: block; }
+
+/* Set first and largest, the card's own name under it, then the number and
+   printing — the same order of importance as an art-less placeholder, so both
+   kinds read the same way when you flip past them. Each line is one line: a
+   caption that wraps would eat into the art above it. */
+.cap-set {
+  font-size: 9pt;
+  font-weight: 500;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cap-name {
+  font-size: 8pt;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cap-meta {
+  font-size: 7.5pt;
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Jumbo cards are counted — they exist and collectors track them — but they will
+   not fit a 63 x 88 mm pocket. Said on the placeholder, before the scissors. */
+.cap-warn {
+  font-size: 7pt;
+  font-weight: 500;
+  color: #8a4b00;
+}
+
+.is-jumbo { outline-style: dashed; }
+
+/* ---- print ---- */
+
+@page { size: A4; margin: 4mm; }
+
+@media print {
+  html, body { background: #fff; }
+  .banner { display: none; }
+  .sheet { margin: 0; }
+}
+
+/* ---- screen ---- */
+
+@media screen {
+  body { padding: 1.5rem 1rem 3rem; }
+
+  .banner {
+    max-width: 210mm;
+    margin: 0 auto 1.5rem;
+    padding: 1.125rem 1.5rem;
+    background: #fff8e6;
+    border: 1px solid #f0dca8;
+    border-radius: 12px;
+    color: #4a3a12;
+  }
+
+  .banner p { margin: 0; }
+
+  .banner-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #7a5a0a;
+  }
+
+  .banner-body {
+    margin-top: 0.375rem !important;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    max-width: 62ch;
+  }
+
+  .banner-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .art-picker,
+  .banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .art-picker label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .art-picker select {
+    padding: 0.4rem 0.5rem;
+    font: inherit;
+    font-size: 0.875rem;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid #d4dff0;
+    border-radius: 8px;
+  }
+
+  .banner-count {
+    margin-top: 0.875rem !important;
+    font-size: 0.8125rem;
+    color: #7a6a42;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.45rem 0.9rem;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .btn-outline {
+    color: #191fbb;
+    background: #fff;
+    border: 1px solid #a2bcff;
+  }
+
+  .btn-accent {
+    color: #001432;
+    background: #00d9c6;
+    border: 1px solid #00d9c6;
+  }
+
+  /* On screen the sheets are a preview of paper, so they are a sheet of A4. */
+  .sheet {
+    padding: 4mm;
+    margin-bottom: 1.5rem;
+    width: 210mm;
+    height: 297mm;
+    border-radius: 2px;
+    box-shadow: 0 2px 12px rgb(0 20 50 / 12%);
+  }
+}

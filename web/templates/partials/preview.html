@@ -202,7 +202,10 @@
     <p>Cut-out placeholders at true 63 × 88 mm, cut lines between. Slot straight into empty pockets.</p>
     <div class="download-foot">
       <span class="download-size">{{.Result.PrintingCount}} {{plural .Result.PrintingCount "card" "cards"}} · {{.Result.SheetPages}} {{plural .Result.SheetPages "page" "pages"}}</span>
-      <a class="btn btn-accent" href="{{.DownloadURL "sheets"}}">Download</a>
+      {{/* A print view rather than a file: the artifact is ink on paper, and the
+           browser's own print pipeline is the only thing that can put it there at
+           an exact physical size. New tab, so the list you were reading survives. */}}
+      <a class="btn btn-accent" href="{{.DownloadURL "sheets"}}" target="_blank" rel="noopener">Open print view</a>
     </div>
   </div>
   <div class="download">

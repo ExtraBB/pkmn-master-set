@@ -45,6 +45,11 @@ type Server struct {
 	pages   map[string]*template.Template
 	// partials renders the htmx fragments, which belong to no single page.
 	partials *template.Template
+	// sheets is the printable sheet, parsed alone. It deliberately does not use
+	// the site layout: a sheet is a physical artifact, and the header, the
+	// wordmark, the fonts and the dark palette are all things you do not want
+	// anywhere near a page you are about to cut up.
+	sheets *template.Template
 }
 
 // New builds the server around a card catalog. The catalog is the product: every
@@ -57,6 +62,8 @@ func New(catalog *cards.Catalog) *Server {
 	}
 	s.partials = template.Must(template.New("partials").Funcs(funcs).ParseFS(web.Templates,
 		"templates/partials/*.html"))
+	s.sheets = template.Must(template.New("sheets.html").Funcs(funcs).ParseFS(web.Templates,
+		"templates/pages/sheets.html"))
 	return s
 }
 
@@ -237,6 +244,21 @@ func queryString(r *http.Request) string {
 	return ""
 }
 
+// redirectTarget rewrites this request's own path with the canonical slug, so
+// /6 goes to /charizard and /download/6/sheets goes to /download/charizard/sheets.
+// Redirecting a download to the preview instead would silently drop the thing the
+// user actually asked for.
+func redirectTarget(r *http.Request, slug string) string {
+	segments := strings.Split(r.URL.Path, "/")
+	for i, seg := range segments {
+		if seg == r.PathValue("slug") {
+			segments[i] = slug
+			break
+		}
+	}
+	return strings.Join(segments, "/") + queryString(r)
+}
+
 // options encodes only what differs from the defaults, so the common URL stays the
 // bare /charizard the design shows.
 func options(lang cards.Language, includeVariants bool) url.Values {
@@ -282,6 +304,29 @@ func (s *Server) handleRows(w http.ResponseWriter, r *http.Request) {
 // batch of rows. It writes the error page itself and reports whether the caller
 // should carry on.
 func (s *Server) preview(w http.ResponseWriter, r *http.Request, offset int) (previewData, bool) {
+	res, ok := s.resolve(w, r)
+	if !ok {
+		return previewData{}, false
+	}
+
+	rows := res.Printings
+	if offset > len(rows) {
+		offset = len(rows)
+	}
+	rows = rows[offset:]
+	if len(rows) > rowsPerRequest {
+		rows = rows[:rowsPerRequest]
+	}
+	return previewData{Result: res, Rows: rows, Offset: offset, Host: r.Host}, true
+}
+
+// resolve turns a request into one answer from the catalog: the slug, the
+// options, the query. It writes the not-found or unavailable page itself and
+// reports whether the caller should carry on.
+//
+// The preview and the printable sheet both start here, so the list you print is
+// by construction the list you were shown.
+func (s *Server) resolve(w http.ResponseWriter, r *http.Request) (cards.Result, bool) {
 	slug := r.PathValue("slug")
 	sp, ok := s.catalog.SpeciesByName(slug)
 	if !ok {
@@ -289,12 +334,12 @@ func (s *Server) preview(w http.ResponseWriter, r *http.Request, offset int) (pr
 		// one canonical URL, so redirect to it rather than serving two.
 		if dexID, err := strconv.Atoi(slug); err == nil {
 			if sp, found := s.catalog.Species(dexID); found {
-				http.Redirect(w, r, "/"+sp.Slug()+queryString(r), http.StatusSeeOther)
-				return previewData{}, false
+				http.Redirect(w, r, redirectTarget(r, sp.Slug()), http.StatusSeeOther)
+				return cards.Result{}, false
 			}
 		}
 		s.notFound(w, slug)
-		return previewData{}, false
+		return cards.Result{}, false
 	}
 
 	q := cards.Query{
@@ -310,7 +355,7 @@ func (s *Server) preview(w http.ResponseWriter, r *http.Request, offset int) (pr
 	if err != nil {
 		if errors.Is(err, cards.ErrUnknownSpecies) {
 			s.notFound(w, slug)
-			return previewData{}, false
+			return cards.Result{}, false
 		}
 		// Anything else is the source being unreachable, and saying so is the only
 		// honest option: an empty table would read as "this Pokémon has no cards".
@@ -319,31 +364,127 @@ func (s *Server) preview(w http.ResponseWriter, r *http.Request, offset int) (pr
 			Result: cards.Result{Species: sp, Language: q.Language, IncludeVariants: q.IncludeVariants},
 			Host:   r.Host,
 		})
-		return previewData{}, false
+		return cards.Result{}, false
 	}
-
-	rows := res.Printings
-	if offset > len(rows) {
-		offset = len(rows)
-	}
-	rows = rows[offset:]
-	if len(rows) > rowsPerRequest {
-		rows = rows[:rowsPerRequest]
-	}
-	return previewData{Result: res, Rows: rows, Offset: offset, Host: r.Host}, true
+	return res, true
 }
 
-// handleDownload is the seam issues 003 and 004 fill in. The routes exist now so
-// the preview's buttons are real links rather than decoration.
+// handleDownload serves one output format. Sheets are here; the PDF and CSV
+// overviews arrive with issue 004.
 func (s *Server) handleDownload(w http.ResponseWriter, r *http.Request) {
 	switch format := r.PathValue("format"); format {
-	case "sheets", "pdf", "csv":
-		http.Error(w, "not implemented yet: "+format+" downloads arrive with issues 003 and 004",
+	case "sheets":
+		s.handleSheets(w, r)
+	case "pdf", "csv":
+		http.Error(w, "not implemented yet: "+format+" downloads arrive with issue 004",
 			http.StatusNotImplemented)
 	default:
 		http.NotFound(w, r)
 	}
 }
+
+// ---- printable sheets ----
+
+// handleSheets renders the core output: card-sized placeholders at true 63x88mm,
+// nine to a page, in the same order the preview showed.
+//
+// It is a page rather than a file. The artifact the collector wants is ink on
+// paper, and the browser's own print pipeline is the only thing that can put it
+// there at an exact physical size — so the product hands over a page built for
+// printing, with the scaling warning on it, instead of a file that would have to
+// be printed by the same browser anyway.
+func (s *Server) handleSheets(w http.ResponseWriter, r *http.Request) {
+	res, ok := s.resolve(w, r)
+	if !ok {
+		return
+	}
+	data := sheetsData{Result: res, Art: artMode(r.URL.Query().Get("art"))}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := s.sheets.ExecuteTemplate(w, "sheets.html", data); err != nil {
+		log.Printf("render sheets %s: %v", res.Species.Name, err)
+	}
+}
+
+// Art treatments. A placeholder marks a gap in a binder, so the default greys the
+// art out: a gap should look like a gap when you flip past it, and a greyed
+// placeholder is not a full-quality reproduction of a card at card size. Full
+// colour and a text-only outline are both a click away for collectors who want
+// recognisability or want to spare the ink.
+const (
+	artGrey    = "grey"
+	artColour  = "colour"
+	artOutline = "outline"
+)
+
+// artMode falls back to the default rather than failing, matching language() and
+// includeVariants(): a mistyped parameter in a shared link should still print.
+func artMode(v string) string {
+	switch strings.ToLower(strings.TrimSpace(v)) {
+	case artColour:
+		return artColour
+	case artOutline:
+		return artOutline
+	default:
+		return artGrey
+	}
+}
+
+// sheetsData backs the printable sheet.
+type sheetsData struct {
+	Result cards.Result
+	Art    string
+}
+
+func (d sheetsData) Species() cards.Species { return d.Result.Species }
+func (d sheetsData) Slug() string           { return d.Result.Species.Slug() }
+
+func (d sheetsData) IsJapanese() bool { return d.Result.Language == cards.LangJA }
+
+func (d sheetsData) IsColour() bool  { return d.Art == artColour }
+func (d sheetsData) IsOutline() bool { return d.Art == artOutline }
+func (d sheetsData) IsGrey() bool    { return d.Art == artGrey }
+
+// Pages chunks the list into sheets of paper. It is done here rather than in the
+// template so the number of placeholders on a page and the page count the preview
+// promised come from the same constant and cannot drift apart.
+func (d sheetsData) Pages() [][]cards.Printing {
+	per := cards.PlaceholdersPerPage
+	all := d.Result.Printings
+	out := make([][]cards.Printing, 0, cards.SheetPages(len(all)))
+	for start := 0; start < len(all); start += per {
+		out = append(out, all[start:min(start+per, len(all))])
+	}
+	return out
+}
+
+// BackURL is the preview this sheet came from, carrying the same options.
+func (d sheetsData) BackURL() string {
+	u := "/" + d.Slug()
+	if q := options(d.Result.Language, d.Result.IncludeVariants); len(q) > 0 {
+		u += "?" + q.Encode()
+	}
+	return u
+}
+
+// ArtURL is this same sheet under a different art treatment — a real link, so
+// every version of the sheet has a URL you can bookmark or share.
+func (d sheetsData) ArtURL(art string) string {
+	q := options(d.Result.Language, d.Result.IncludeVariants)
+	if art != artGrey {
+		q.Set("art", art)
+	}
+	u := "/download/" + d.Slug() + "/sheets"
+	if len(q) > 0 {
+		u += "?" + q.Encode()
+	}
+	return u
+}
+
+// Named URLs, because a template cannot hand a plain string to a typed constant.
+func (d sheetsData) GreyURL() string    { return d.ArtURL(artGrey) }
+func (d sheetsData) ColourURL() string  { return d.ArtURL(artColour) }
+func (d sheetsData) OutlineURL() string { return d.ArtURL(artOutline) }
 
 // language falls back to English rather than failing: a mistyped parameter in a
 // shared link should still show a list.

@@ -512,16 +512,273 @@ func TestGoRedirects(t *testing.T) {
 	}
 }
 
-// The download routes exist so the preview's buttons are real links; the files
-// themselves arrive with issues 003 and 004.
-func TestDownloadsNotYetImplemented(t *testing.T) {
+// The two overview downloads arrive with issue 004. Their routes exist so the
+// preview's buttons are real links rather than decoration.
+func TestOverviewDownloadsNotYetImplemented(t *testing.T) {
 	h := newTestServer(t)
-	for _, format := range []string{"sheets", "pdf", "csv"} {
+	for _, format := range []string{"pdf", "csv"} {
 		rec := get(t, h, "/download/charizard/"+format)
 		if rec.Code != http.StatusNotImplemented {
 			t.Errorf("%s: status = %d, want 501", format, rec.Code)
 		}
 	}
+}
+
+// ---- printable sheets ----
+
+// The core output. Everything asserted here is something a collector finds out
+// about only after cutting, if it is wrong.
+func TestSheets(t *testing.T) {
+	rec := get(t, newTestServer(t), "/download/charizard/sheets")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
+	}
+	body := rec.Body.String()
+
+	for _, want := range []string{
+		// The scale defence, on the page and in the instructions.
+		"50 mm", "Print at 100%", "fit to page",
+		// The caption: set, number, printing.
+		"Base Set", "4/102", "1st Edition", "Shadowless", "Unlimited",
+		"Dark Charizard",                      // a card whose name is not the species' reads as itself
+		`src="https://img/base1/4/high.webp"`, // image-led, at print quality
+		`href="/charizard"`,                   // and a way back to the list
+	} {
+		if !strings.Contains(body, want) {
+			t.Errorf("sheet does not contain %q", want)
+		}
+	}
+
+	// An image that has not loaded because it is off screen prints blank.
+	if strings.Contains(body, `loading="lazy"`) {
+		t.Error("placeholder art must not be lazily loaded")
+	}
+	// The sheet is a physical artifact: no site chrome, no prices, nothing to click
+	// off the page.
+	for _, unwanted := range []string{"htmx", "cardmarket", "tcgplayer", "€", "$"} {
+		if strings.Contains(strings.ToLower(body), unwanted) {
+			t.Errorf("sheet contains %q, which does not belong on paper", unwanted)
+		}
+	}
+
+	// Same order as the preview: chronological by set release, undated last.
+	if !inOrder(body, []string{"Base Set", "Base Set 2", "Team Rocket", "Wizards Promo"}) {
+		t.Error("sheet printings are not in the preview's chronological order")
+	}
+	if !inOrder(body, []string{"1st Edition", "Shadowless", "Unlimited"}) {
+		t.Error("Base Set printings are not in print-run order")
+	}
+
+	// One placeholder per printing, and no more paper than the preview promised.
+	if got := strings.Count(body, `class="placeholder`); got != 7 {
+		t.Errorf("placeholders = %d, want 7 (one per printing)", got)
+	}
+	if got := strings.Count(body, `class="sheet"`); got != 1 {
+		t.Errorf("sheets = %d, want 1 — the preview promised 1 page", got)
+	}
+
+	// The promo card has no art in the source. With no picture to recognise, the
+	// placeholder has to say everything a captioned one says — set, number and
+	// printing, not just the name — because those words are all that identifies
+	// the gap.
+	blank, ok := blockAt(body, "art-blank")
+	if !ok {
+		t.Fatal("a card with no art must still get a placeholder")
+	}
+	for _, want := range []string{"Charizard", "Wizards Promo", "1", "Holo"} {
+		if !strings.Contains(blank, want) {
+			t.Errorf("the art-less placeholder does not contain %q", want)
+		}
+	}
+	// The set is what you flip to, so it leads; the card names itself under it,
+	// and the number and printing settle it in the smallest type.
+	if !inOrder(blank, []string{"blank-set", "blank-name", "blank-meta"}) {
+		t.Error("the art-less placeholder does not lead with the set")
+	}
+	if strings.Contains(body, `src=""`) || strings.Contains(body, "ZgotmplZ") {
+		t.Error("a card with no art rendered an empty or rejected image URL")
+	}
+}
+
+// The geometry is the acceptance criterion, and it lives in the stylesheet: a
+// placeholder that measures 61 mm does not sit in a binder pocket.
+func TestSheetGeometry(t *testing.T) {
+	rec := get(t, newTestServer(t), "/static/css/print.css")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
+	}
+	css := rec.Body.String()
+
+	for _, want := range []string{
+		"width: 63mm", "height: 88mm", // true trading-card size
+		"width: 189mm", // a 3 x 3 grid of them
+		"height: 50mm", // the strip the user measures before cutting
+		// A4, named so the print dialog opens on the right paper, with margins
+		// small enough that the grid never has to be shrunk to fit.
+		"@page { size: A4; margin: 4mm; }",
+		"print-color-adjust", // or the cut lines and the greying never reach paper
+	} {
+		if !strings.Contains(css, want) {
+			t.Errorf("print.css does not contain %q", want)
+		}
+	}
+}
+
+// The page count on the sheet has to be the one the preview promised, because
+// that number is what the user decided to spend paper on.
+func TestSheetsPageCountMatchesThePromise(t *testing.T) {
+	src := testSource(t)
+	// Eleven printings: two pages of nine, so the chunking is actually exercised.
+	for i := range 10 {
+		src.cards[cards.LangEN] = append(src.cards[cards.LangEN], cards.Card{
+			ID: fmt.Sprintf("base2-%d", 20+i), Name: "Charizard", Number: fmt.Sprintf("%d", 20+i),
+			DexIDs: []int{6}, Rarity: "Rare", ImageBase: fmt.Sprintf("https://img/base2/%d", 20+i),
+			SetID: "base2", SetName: "Base Set 2", SetTotal: 130,
+			Variants: []cards.Variant{variant("normal", "unlimited")},
+		})
+	}
+	h := newTestServerWith(t, src)
+
+	body := get(t, h, "/download/charizard/sheets").Body.String()
+	if got := strings.Count(body, `class="placeholder`); got != 17 {
+		t.Errorf("placeholders = %d, want 17", got)
+	}
+	if got := strings.Count(body, `class="sheet"`); got != 2 {
+		t.Errorf("sheets = %d, want 2 (17 placeholders, 9 to a page)", got)
+	}
+	if got := strings.Count(get(t, h, "/charizard").Body.String(), "2 pages"); got == 0 {
+		t.Error("the preview should have promised 2 pages for the same list")
+	}
+}
+
+// All three treatments are reachable, and a treatment nobody asked for falls back
+// to the default rather than failing: a mistyped parameter in a shared link should
+// still print.
+func TestSheetsArtTreatments(t *testing.T) {
+	h := newTestServer(t)
+
+	tests := []struct {
+		path     string
+		wantAll  []string
+		wantNone []string
+	}{
+		{
+			path:    "/download/charizard/sheets",
+			wantAll: []string{`class="art-grey"`, `src="https://img/base1/4/high.webp"`},
+		},
+		{
+			path:    "/download/charizard/sheets?art=colour",
+			wantAll: []string{`class="art-colour"`, `src="https://img/base1/4/high.webp"`},
+		},
+		{
+			// No art at all: the name carries the identification, and the sheet
+			// costs a fraction of the ink.
+			path:     "/download/charizard/sheets?art=outline",
+			wantAll:  []string{`class="art-outline"`, "art-blank", "Dark Charizard"},
+			wantNone: []string{"<img"},
+		},
+		{
+			path:    "/download/charizard/sheets?art=nonsense",
+			wantAll: []string{`class="art-grey"`},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.path, func(t *testing.T) {
+			rec := get(t, h, tt.path)
+			if rec.Code != http.StatusOK {
+				t.Fatalf("status = %d, want 200", rec.Code)
+			}
+			body := rec.Body.String()
+			for _, want := range tt.wantAll {
+				if !strings.Contains(body, want) {
+					t.Errorf("body does not contain %q", want)
+				}
+			}
+			for _, unwanted := range tt.wantNone {
+				if strings.Contains(body, unwanted) {
+					t.Errorf("body contains %q", unwanted)
+				}
+			}
+		})
+	}
+}
+
+// The sheet carries the options it was asked for, so the paper matches the list
+// the user was looking at.
+func TestSheetsCarryTheOptions(t *testing.T) {
+	h := newTestServer(t)
+
+	body := get(t, h, "/download/charizard/sheets?variants=0").Body.String()
+	if got := strings.Count(body, `class="placeholder`); got != 4 {
+		t.Errorf("placeholders = %d, want 4 (one per card, variants off)", got)
+	}
+	// With variants collapsed the row stands for the card, so no printing is
+	// claimed for it.
+	if strings.Contains(body, "Shadowless") {
+		t.Error("a collapsed placeholder must not be captioned with one printing's name")
+	}
+	// The options survive the round trip through the art picker and the back link.
+	for _, want := range []string{`name="variants" value="0"`, `href="/charizard?variants=0"`} {
+		if !strings.Contains(body, want) {
+			t.Errorf("sheet does not contain %q", want)
+		}
+	}
+
+	// A Pokémon with no cards in a language prints nothing, and says so rather than
+	// spooling blank paper.
+	empty := get(t, h, "/download/charizard/sheets?lang=ja")
+	if empty.Code != http.StatusOK {
+		t.Fatalf("empty list: status = %d, want 200", empty.Code)
+	}
+	if !strings.Contains(empty.Body.String(), "Nothing to print") {
+		t.Error("an empty list should say there is nothing to print")
+	}
+	if strings.Contains(empty.Body.String(), `class="sheet"`) {
+		t.Error("an empty list must not render a blank sheet of paper")
+	}
+}
+
+// A Dex number is a reasonable thing to type anywhere, and redirecting a download
+// to the preview would silently drop the thing the user actually asked for.
+func TestSheetsDexRedirectKeepsTheFormat(t *testing.T) {
+	rec := get(t, newTestServer(t), "/download/6/sheets?variants=0")
+	if rec.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want 303", rec.Code)
+	}
+	if got, want := rec.Header().Get("Location"), "/download/charizard/sheets?variants=0"; got != want {
+		t.Errorf("Location = %q, want %q", got, want)
+	}
+}
+
+// An unreachable source must not print as a stack of blank cards.
+func TestSheetsSourceUnavailable(t *testing.T) {
+	src := testSource(t)
+	src.err = errors.New("tcgdex is down")
+	rec := get(t, newTestServerWith(t, src), "/download/charizard/sheets")
+
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Fatalf("status = %d, want 503", rec.Code)
+	}
+	if strings.Contains(rec.Body.String(), `class="sheet"`) {
+		t.Error("a failure must not render printable pages")
+	}
+}
+
+// blockAt returns the markup from the first occurrence of marker to the end of
+// the element that contains it, so an assertion about one placeholder cannot be
+// satisfied by text belonging to a different one.
+func blockAt(body, marker string) (string, bool) {
+	start := strings.Index(body, marker)
+	if start < 0 {
+		return "", false
+	}
+	rest := body[start:]
+	end := strings.Index(rest, "</div>")
+	if end < 0 {
+		return rest, true
+	}
+	return rest[:end], true
 }
 
 // inOrder reports whether each string appears after the previous one.
