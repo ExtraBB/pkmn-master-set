@@ -127,3 +127,7 @@ the webfonts, Jost and Inter, loaded from Google Fonts with system-font fallback
 degrades rather than breaks.
 
 Templates and static assets are embedded, so restart the server to pick up edits.
+
+## License
+
+[MIT](LICENSE)
