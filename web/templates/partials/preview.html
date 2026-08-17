@@ -89,6 +89,8 @@
         {{end}}
         <th class="col-illustrator" scope="col">Illustrator</th>
         <th class="col-released" scope="col">Released</th>
+        <th class="col-price" scope="col">Cardmarket<span class="visually-hidden"> — links to the listing, in a new tab</span></th>
+        <th class="col-price" scope="col">TCGplayer<span class="visually-hidden"> — links to the listing, in a new tab</span></th>
       </tr>
     </thead>
     <tbody id="rows">{{template "rows" .}}</tbody>
@@ -154,6 +156,20 @@
     </td>
     <td class="col-illustrator">{{$p.Display "illustrator"}}</td>
     <td class="col-released">{{$p.Display "year"}}</td>
+    <td class="col-price">
+      {{- with $p.CardmarketURL}}
+        <a class="price-link" href="{{.}}" target="_blank" rel="noopener noreferrer">{{$p.Display "cardmarketPrice"}}</a>
+      {{- else}}
+        {{$p.Display "cardmarketPrice"}}
+      {{- end}}
+    </td>
+    <td class="col-price">
+      {{- with $p.TCGPlayerURL}}
+        <a class="price-link" href="{{.}}" target="_blank" rel="noopener noreferrer">{{$p.Display "tcgplayerPrice"}}</a>
+      {{- else}}
+        {{$p.Display "tcgplayerPrice"}}
+      {{- end}}
+    </td>
   </tr>
   {{- end}}
 {{end}}

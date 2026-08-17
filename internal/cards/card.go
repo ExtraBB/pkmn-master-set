@@ -103,6 +103,47 @@ type Card struct {
 	SetName     string    `json:"setName"`
 	SetTotal    int       `json:"setTotal"`
 	Variants    []Variant `json:"variants"`
+	// Pricing is the card's own pricing block, read from tcgdex's top-level
+	// "pricing" field. It is the primary source for Printing.Pricing: it carries
+	// every finish tcgdex has a listing for, and tcgdex populates it far more
+	// reliably than any single variant's own copy — see Variant.Pricing.
+	Pricing Pricing `json:"pricing"`
+}
+
+// CardmarketPricing is a card's Cardmarket average, in EUR. AvgHolo is the same
+// average for the card's holo finish; Cardmarket does not price any finer than
+// plain vs. holo.
+type CardmarketPricing struct {
+	ProductID int     `json:"productId"`
+	Avg       float64 `json:"avg"`
+	AvgHolo   float64 `json:"avgHolo"`
+}
+
+// TCGPlayerFinish is one priced finish of a card on TCGplayer, e.g. "normal" or
+// "reverse-holofoil".
+type TCGPlayerFinish struct {
+	ProductID   int     `json:"productId"`
+	MarketPrice float64 `json:"marketPrice"`
+}
+
+// TCGPlayerPricing is a card's TCGplayer prices, in USD, keyed by finish name.
+// The finish vocabulary is not a fixed enum, so callers pick a finish rather than
+// assuming one exists.
+type TCGPlayerPricing struct {
+	Finishes map[string]TCGPlayerFinish `json:"finishes"`
+}
+
+// Pricing is a market pricing block: either a card's own, or (occasionally) a
+// specific variant's more specific copy of it. See Card.Pricing and
+// Variant.Pricing for which one a Printing actually renders.
+type Pricing struct {
+	Cardmarket CardmarketPricing `json:"cardmarket"`
+	TCGPlayer  TCGPlayerPricing  `json:"tcgplayer"`
+}
+
+// IsZero reports whether a pricing block carries no data at all.
+func (p Pricing) IsZero() bool {
+	return p.Cardmarket == (CardmarketPricing{}) && len(p.TCGPlayer.Finishes) == 0
 }
 
 // Printing is one row of output: a card in one specific printing. Everything the
@@ -126,6 +167,9 @@ type Printing struct {
 	ReleaseDate Date     `json:"releaseDate"`
 	Illustrator string   `json:"illustrator"`
 	ImageBase   string   `json:"imageBase"`
+	// Pricing is this printing's resolved market pricing: the variant's own
+	// pricing when tcgdex has one, otherwise the card's. Zero when neither does.
+	Pricing Pricing `json:"pricing"`
 
 	// VariantLabel is the full human label ("1st Edition · Shadowless · Holo").
 	// Empty when variants are collapsed, because the row then stands for the card
@@ -161,6 +205,110 @@ func (p Printing) ImageURL(quality, ext string) string {
 		return ""
 	}
 	return p.ImageBase + "/" + quality + "." + ext
+}
+
+// CardmarketPrice is the Cardmarket average price for this printing, in EUR, and
+// whether the source had one at all. Holo and reverse-holo finishes get the
+// holo average; Cardmarket does not price any finer than that.
+func (p Printing) CardmarketPrice() (float64, bool) {
+	cm := p.Pricing.Cardmarket
+	if (p.Variant.Type == "holo" || p.Variant.Type == "reverse") && cm.AvgHolo > 0 {
+		return cm.AvgHolo, true
+	}
+	if cm.Avg > 0 {
+		return cm.Avg, true
+	}
+	return 0, false
+}
+
+// CardmarketURL links to this printing's Cardmarket listing, or "" when the
+// source had no product ID for it.
+//
+// Cardmarket's own redirect form is "/{Game}/Products?idProduct={id}" — no
+// "/Singles" segment. That segment belongs to the browsable category listing,
+// which is why appending idProduct to it just lands on the general Singles page
+// instead of the product.
+func (p Printing) CardmarketURL() string {
+	if p.Pricing.Cardmarket.ProductID == 0 {
+		return ""
+	}
+	q := url.Values{"idProduct": {strconv.Itoa(p.Pricing.Cardmarket.ProductID)}}
+	return "https://www.cardmarket.com/en/Pokemon/Products?" + q.Encode()
+}
+
+// tcgplayerFinish picks the TCGplayer finish that best matches this printing's
+// variant. TCGplayer's finish names are not this product's variant taxonomy, so
+// the match is a best-effort guess by name, falling back to whatever finish the
+// source has when nothing matches.
+func (p Printing) tcgplayerFinish() (TCGPlayerFinish, bool) {
+	finishes := p.Pricing.TCGPlayer.Finishes
+	if len(finishes) == 0 {
+		return TCGPlayerFinish{}, false
+	}
+
+	var prefix string
+	switch {
+	case slices.Contains(p.Variant.Stamps, "1st-edition"):
+		prefix = "1st-edition"
+	case p.Variant.Subtype == "unlimited":
+		prefix = "unlimited"
+	}
+	var suffix string
+	switch p.Variant.Type {
+	case "holo":
+		suffix = "holofoil"
+	case "reverse":
+		suffix = "reverse-holofoil"
+	case "normal", "":
+		suffix = "normal"
+	}
+
+	for _, key := range []string{joinNonEmpty(prefix, suffix), prefix, suffix, "normal"} {
+		if key == "" {
+			continue
+		}
+		if f, ok := finishes[key]; ok {
+			return f, true
+		}
+	}
+
+	// Nothing matched: any finish beats no price at all.
+	keys := make([]string, 0, len(finishes))
+	for k := range finishes {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	return finishes[keys[0]], true
+}
+
+func joinNonEmpty(parts ...string) string {
+	var kept []string
+	for _, p := range parts {
+		if p != "" {
+			kept = append(kept, p)
+		}
+	}
+	return strings.Join(kept, "-")
+}
+
+// TCGPlayerPrice is the TCGplayer market price for this printing's best-matched
+// finish, in USD, and whether the source had one at all.
+func (p Printing) TCGPlayerPrice() (float64, bool) {
+	f, ok := p.tcgplayerFinish()
+	if !ok || f.MarketPrice <= 0 {
+		return 0, false
+	}
+	return f.MarketPrice, true
+}
+
+// TCGPlayerURL links to this printing's TCGplayer listing, or "" when the source
+// had no product ID for it.
+func (p Printing) TCGPlayerURL() string {
+	f, ok := p.tcgplayerFinish()
+	if !ok || f.ProductID == 0 {
+		return ""
+	}
+	return "https://www.tcgplayer.com/product/" + strconv.Itoa(f.ProductID)
 }
 
 // bulbapediaGo is Bulbapedia's "jump to the article, else show search results"
@@ -249,6 +397,16 @@ func (p Printing) Display(field string) string {
 			return unknown
 		}
 		return strconv.Itoa(p.ReleaseDate.Year())
+	case "cardmarketPrice":
+		if v, ok := p.CardmarketPrice(); ok {
+			return "€" + strconv.FormatFloat(v, 'f', 2, 64)
+		}
+		return unknown
+	case "tcgplayerPrice":
+		if v, ok := p.TCGPlayerPrice(); ok {
+			return "$" + strconv.FormatFloat(v, 'f', 2, 64)
+		}
+		return unknown
 	default:
 		return ""
 	}

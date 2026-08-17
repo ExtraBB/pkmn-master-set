@@ -653,6 +653,12 @@ main {
   color: var(--muted);
 }
 
+.col-price {
+  text-align: right;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .thumb {
   display: block;
   width: 44px;
@@ -754,11 +760,13 @@ main {
   color: var(--muted);
 }
 
-/* The set name is the way out of the preview and into the card's history. It keeps
-   the colour of the cell it lives in — a whole column of action-coloured links
-   would compete with the one accent this page reserves for the download — and
-   states itself on hover. */
-.set-link {
+/* The set name and the two price cells are all ways out of the preview — to the
+   card's history or to a listing to buy it. They keep the colour of the cell
+   they live in — a whole column of action-coloured links would compete with the
+   one accent this page reserves for the download — and state themselves on
+   hover. */
+.set-link,
+.price-link {
   color: inherit;
   text-decoration-line: underline;
   text-decoration-color: var(--border);
@@ -766,7 +774,9 @@ main {
 }
 
 .set-link:hover,
-.set-link:focus-visible {
+.set-link:focus-visible,
+.price-link:hover,
+.price-link:focus-visible {
   color: var(--action-text);
   text-decoration-color: currentcolor;
 }
@@ -972,7 +982,8 @@ main {
 /* ---- narrow screens ---- */
 
 @media (max-width: 60rem) {
-  .col-illustrator {
+  .col-illustrator,
+  .col-price {
     display: none;
   }
 

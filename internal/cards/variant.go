@@ -22,6 +22,12 @@ type Variant struct {
 	Stamps []string `json:"stamps"`
 	// Size is "standard" or "jumbo".
 	Size string `json:"size"`
+	// Pricing is this specific variant entry's own copy of the pricing block,
+	// which tcgdex leaves zero for most variants even when the card overall is
+	// priced — see Card.Pricing, which callers fall back to. Pricing plays no
+	// part in Key() or dedup: two variants with the same identity but different
+	// pricing data are still the same printing.
+	Pricing Pricing `json:"-"`
 }
 
 // Key is the stable, semantic identity of a printing.
@@ -68,6 +74,7 @@ func NormalizeVariants(vs []Variant) []Variant {
 	out := make([]Variant, 0, len(vs))
 	for _, v := range vs {
 		n := NormalizeVariant(v.Type, v.Subtype, v.Stamps, v.Size)
+		n.Pricing = v.Pricing
 		if _, dup := seen[n.Key()]; dup {
 			continue
 		}

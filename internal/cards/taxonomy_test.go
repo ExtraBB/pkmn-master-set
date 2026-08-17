@@ -45,7 +45,7 @@ func TestTaxonomyNamesItsExclusions(t *testing.T) {
 	for _, topic := range []string{
 		"Miscut",       // physical defects
 		"Trainer",      // cards that merely depict a Pokémon
-		"Prices",       // out of scope per the PRD
+		"Price history", // portfolio/value tracking is out of scope; a current price is not
 		"Grading",      // condition is not a printing
 		"Japanese cov", // the known source gap
 	} {

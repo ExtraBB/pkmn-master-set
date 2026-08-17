@@ -42,7 +42,7 @@ Named explicitly, so you never have to wonder whether we forgot.
 | **Grading, condition and provenance** | A PSA 10 and a played copy are the same printing. Condition is about the individual object, not about what exists. |
 | **Trainer and Energy cards that depict a Pokémon** | The card is not *of* that Pokémon. Our source does not tag them with a Dex number, and the PRD puts cameo and appearance cards out of scope. |
 | **Sealed product, tins, jumbo boxes, coins and inserts** | Not cards. |
-| **Prices** | The product is about what exists, not what it costs. |
+| **Price history, portfolio value** | The preview shows a current price per printing; tracking it over time is a different product. |
 | **Gameplay data** — HP, attacks, abilities | Not something a placeholder or a checklist needs. |
 | **Languages other than English and Japanese** | Out of scope for v1. |
 
@@ -64,6 +64,11 @@ fields, in the same order:
 
 **When a field is unknown, it says "unknown".** It never renders as an empty cell. A blank reads as a
 bug; a stated "unknown" reads as what it is — a gap in the source data.
+
+The on-screen preview additionally shows a current Cardmarket and TCGplayer price, each linking out to
+that printing's listing. This is deliberately preview-only, not carried into the printable sheets, the
+PDF or the CSV: those are artifacts meant to be printed or filed away, and a price baked into a
+downloaded file goes stale the moment it's saved.
 
 ## Ordering
 

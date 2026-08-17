@@ -74,8 +74,10 @@ so the effect of the toggle is legible immediately, per requirement 11.
 
 ## Deliberately absent
 
-No sort, no filter, no per-card selection, no checkboxes, no account prompt, no prices — the
-preview is a confirmation step, not a workspace.
+No sort, no filter, no per-card selection, no checkboxes, no account prompt — the preview is a
+confirmation step, not a workspace. (Cardmarket/TCGplayer price columns were added after this
+design pass and are not shown in the screenshots above; they follow the same read-only,
+quietly-styled link treatment as the set-name link described in screen 02.)
 
 ## Placeholders
 

@@ -83,6 +83,46 @@ func charizardFixture(t *testing.T) *fakeSource {
 	}
 }
 
+// tcgdex leaves most variants' own pricing at the zero value even when the
+// card overall is priced, so a printing must fall back to the card's pricing
+// rather than showing "unknown" whenever its own variant entry has none — but
+// still prefer the variant's own data on the rare occasion tcgdex has it.
+func TestPrintingPricingFallsBackToCardWhenVariantHasNone(t *testing.T) {
+	cardPricing := Pricing{Cardmarket: CardmarketPricing{ProductID: 1, Avg: 10}}
+	variantPricing := Pricing{Cardmarket: CardmarketPricing{ProductID: 2, Avg: 20}}
+
+	src := &fakeSource{
+		sets: map[string]Set{"base1": {ID: "base1", Name: "Base Set", CountOfficial: 102}},
+		cards: map[Language][]Card{
+			LangEN: {{
+				ID: "base1-4", Name: "Charizard", Number: "4", DexIDs: []int{6},
+				SetID: "base1", SetName: "Base Set", SetTotal: 102,
+				Pricing: cardPricing,
+				Variants: []Variant{
+					{Type: "holo", Subtype: "unlimited", Size: "standard", Pricing: variantPricing},
+					{Type: "holo", Subtype: "shadowless", Size: "standard"},
+				},
+			}},
+		},
+	}
+
+	got, err := testCatalog(t, src).Query(context.Background(), Query{DexID: 6, Language: LangEN, IncludeVariants: true})
+	if err != nil {
+		t.Fatalf("Query: %v", err)
+	}
+	if len(got.Printings) != 2 {
+		t.Fatalf("got %d printings, want 2", len(got.Printings))
+	}
+	// Earliest print run first: Shadowless (no variant pricing of its own) sorts
+	// before Unlimited (has its own).
+	if p := got.Printings[0]; p.Variant.Subtype != "shadowless" || p.Pricing.Cardmarket != cardPricing.Cardmarket {
+		t.Errorf("shadowless printing = %+v pricing %+v, want the card's fallback %+v", p.Variant, p.Pricing.Cardmarket, cardPricing.Cardmarket)
+	}
+	if p := got.Printings[1]; p.Variant.Subtype != "unlimited" || p.Pricing.Cardmarket != variantPricing.Cardmarket {
+		t.Errorf("unlimited printing = %+v pricing %+v, want the variant's own %+v", p.Variant, p.Pricing.Cardmarket, variantPricing.Cardmarket)
+	}
+}
+
 func TestQueryWithVariantsExpandsEveryPrinting(t *testing.T) {
 	cat := testCatalog(t, charizardFixture(t))
 

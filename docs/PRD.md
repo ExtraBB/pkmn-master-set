@@ -43,7 +43,7 @@ short is a product requirement, not an aspiration.
 | --- | --- |
 | Digital ownership tracking, checkboxes, progress % | Tracking is physical. This is the pivot: we generate the artifact, the binder holds the state. |
 | Accounts, logins, saved collections | Nothing to save. The output is a file. |
-| Prices | The product is about what exists, not what it costs. |
+| Price history, portfolio value, a "what's my binder worth" feature | The product is about what exists, not tracking its value over time. A current market price per printing, linking out to buy it, is in scope — see the preview list. |
 | Gameplay data (attacks, HP, abilities) | Not what a collector needs on a placeholder or a checklist. |
 | A browsing/filtering workspace | The preview exists to confirm what you're downloading, not to become a place you spend time. The download is the deliverable. |
 
@@ -118,6 +118,9 @@ Charizard · English · with variants        214 cards · ~24 pages
 
 - A **compact list with thumbnails** — one row per card variant, showing the same fields the PDF and
   CSV will contain. It's a preview of the data, so it should look like the data.
+- Each row also shows a current Cardmarket and TCGplayer price, each linking out to that printing's
+  listing — a collector deciding whether to hunt down a printing wants to know roughly what it costs,
+  without this becoming a price-tracking product in its own right.
 - Ordered chronologically by set release, matching the print output. What you see is the order you
   get.
 - The generation options (language, variants on/off) sit above the list and **update it live**, so
@@ -174,8 +177,9 @@ one.
 12. Shareable URL per Pokémon so a previewed list can be linked or bookmarked.
 
 ### Won't have (v1)
-13. Sorting, filtering or per-card selection in the preview; any digital ownership tracking, accounts, prices, gameplay data, cameo/appearance cards,
-    languages beyond EN/JP, custom binder layout pickers.
+13. Sorting, filtering or per-card selection in the preview; any digital ownership tracking, accounts,
+    price history or portfolio value, gameplay data, cameo/appearance cards, languages beyond EN/JP,
+    custom binder layout pickers.
 
 ## Success Criteria
 

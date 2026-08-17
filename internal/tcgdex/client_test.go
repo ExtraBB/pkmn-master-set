@@ -22,10 +22,11 @@ func newTestClient(t *testing.T, h http.HandlerFunc) *Client {
 	return New(WithBaseURL(srv.URL), WithBackoff(noBackoff))
 }
 
-// The detail shape the real API returns, including the pricing block that dwarfs
-// everything this product needs. It is in the fixture on purpose: dropping pricing
-// at decode time is a promise of the PRD, so a test should exercise it rather than
-// a hand-trimmed fixture that could never catch its return.
+// The detail shape the real API returns. tcgdex prices variants_detailed
+// entries individually rather than the card as a whole: real Base Set Charizard
+// data has a tracked listing for the Unlimited printing but none for Shadowless
+// or 1st Edition, so this fixture mirrors that — one priced entry, two with a
+// null "pricing".
 const charizardDetail = `{
   "id":"base1-4","localId":"4","name":"Charizard","category":"Pokemon","dexId":[6],
   "rarity":"Rare","illustrator":"Mitsuhiro Arita",
@@ -33,8 +34,11 @@ const charizardDetail = `{
   "variants":{"normal":false,"reverse":false,"holo":true,"firstEdition":true,"wPromo":false},
   "variants_detailed":[
     {"type":"holo","subtype":"unlimited","size":"standard","variantId":"4ffrmhcf",
-     "pricing":{"cardmarket":{"unit":"EUR","avg":249.99},"tcgplayer":{"unit":"USD","holofoil":{"marketPrice":312.4}}}},
-    {"type":"holo","subtype":"shadowless","stamp":["1st-edition"],"size":"standard","variantId":"mtltux8q"},
+     "pricing":{"cardmarket":{"unit":"EUR","idProduct":483559,"avg":249.99,"avg-holo":312.4},
+       "tcgplayer":{"unit":"USD","updated":"2026-08-17T00:00:00Z",
+         "holofoil":{"productId":219333,"marketPrice":312.4}}}},
+    {"type":"holo","subtype":"shadowless","stamp":["1st-edition"],"size":"standard","variantId":"mtltux8q",
+     "pricing":{"cardmarket":null,"tcgplayer":null}},
     {"type":"holo","subtype":"shadowless","size":"standard","variantId":"3taksсxp"}],
   "set":{"id":"base1","name":"Base Set","cardCount":{"official":102,"total":102}}
 }`
@@ -98,6 +102,22 @@ func TestCardsByDexUsesREST(t *testing.T) {
 	// they have to survive the REST decode intact.
 	if card.Variants[1].Subtype != "shadowless" || len(card.Variants[1].Stamp) != 1 {
 		t.Errorf("variant 1 = %+v, want shadowless with a stamp", card.Variants[1])
+	}
+	// The Unlimited printing has a tracked listing...
+	unlimited := card.Variants[0].Pricing
+	if unlimited.Cardmarket.IDProduct != 483559 || unlimited.Cardmarket.Avg != 249.99 {
+		t.Errorf("unlimited cardmarket pricing = %+v", unlimited.Cardmarket)
+	}
+	if f := unlimited.TCGPlayer.Finishes["holofoil"]; f.ProductID != 219333 || f.MarketPrice != 312.4 {
+		t.Errorf("unlimited tcgplayer holofoil finish = %+v", f)
+	}
+	if _, ok := unlimited.TCGPlayer.Finishes["unit"]; ok {
+		t.Error("tcgplayer finishes should not include the \"unit\" metadata key")
+	}
+	// ...but the 1st Edition Shadowless printing does not, and must not inherit
+	// the Unlimited printing's price.
+	if stamped := card.Variants[1].Pricing; stamped.Cardmarket.IDProduct != 0 || stamped.Cardmarket.Avg != 0 {
+		t.Errorf("stamped shadowless pricing = %+v, want zero value", stamped)
 	}
 }
 

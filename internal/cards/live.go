@@ -187,7 +187,10 @@ func (s *LiveSource) WarmSets(ctx context.Context, lang Language) error {
 func fromWire(c tcgdex.Card) Card {
 	variants := make([]Variant, len(c.Variants))
 	for i, v := range c.Variants {
-		variants[i] = Variant{Type: v.Type, Subtype: v.Subtype, Stamps: v.Stamp, Size: v.Size}
+		variants[i] = Variant{
+			Type: v.Type, Subtype: v.Subtype, Stamps: v.Stamp, Size: v.Size,
+			Pricing: fromWirePricing(v.Pricing),
+		}
 	}
 	return Card{
 		ID:          c.ID,
@@ -201,5 +204,24 @@ func fromWire(c tcgdex.Card) Card {
 		SetName:     c.SetName,
 		SetTotal:    c.SetTotal,
 		Variants:    NormalizeVariants(variants),
+		Pricing:     fromWirePricing(c.Pricing),
 	}
+}
+
+func fromWirePricing(p tcgdex.Pricing) Pricing {
+	out := Pricing{
+		Cardmarket: CardmarketPricing{
+			ProductID: p.Cardmarket.IDProduct,
+			Avg:       p.Cardmarket.Avg,
+			AvgHolo:   p.Cardmarket.AvgHolo,
+		},
+	}
+	if len(p.TCGPlayer.Finishes) == 0 {
+		return out
+	}
+	out.TCGPlayer.Finishes = make(map[string]TCGPlayerFinish, len(p.TCGPlayer.Finishes))
+	for key, f := range p.TCGPlayer.Finishes {
+		out.TCGPlayer.Finishes[key] = TCGPlayerFinish{ProductID: f.ProductID, MarketPrice: f.MarketPrice}
+	}
+	return out
 }

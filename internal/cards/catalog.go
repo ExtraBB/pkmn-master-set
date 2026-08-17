@@ -171,6 +171,7 @@ func expand(card Card, set Set, lang Language, includeVariants bool) []Printing 
 	if !includeVariants {
 		p := base
 		p.Variant = Collapse(variants)
+		p.Pricing = resolvePricing(p.Variant, card)
 		p.ID = card.ID
 		p.Collapsed = len(variants)
 		// The label is left empty: with variants off the row stands for the card
@@ -182,6 +183,7 @@ func expand(card Card, set Set, lang Language, includeVariants bool) []Printing 
 	for _, v := range variants {
 		p := base
 		p.Variant = v
+		p.Pricing = resolvePricing(v, card)
 		p.ID = card.ID + "#" + v.Key()
 		p.VariantLabel = v.Label()
 		p.VariantShort = v.Short()
@@ -189,6 +191,18 @@ func expand(card Card, set Set, lang Language, includeVariants bool) []Printing 
 		out = append(out, p)
 	}
 	return out
+}
+
+// resolvePricing picks the pricing block a printing renders. tcgdex populates a
+// variant's own pricing for only a minority of variants — most carry the zero
+// value even when the card overall is priced — so the card's pricing, which
+// tcgdex fills in far more reliably and which carries every finish it has a
+// listing for, is the fallback rather than the exception.
+func resolvePricing(v Variant, card Card) Pricing {
+	if !v.Pricing.IsZero() {
+		return v.Pricing
+	}
+	return card.Pricing
 }
 
 // missingFields names every promised field the source had no value for, so output

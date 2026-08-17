@@ -21,5 +21,6 @@ but should start early: the first test print is worth more than any amount of sp
 
 ## Out of scope for v1
 
-Digital ownership tracking, accounts, prices, gameplay data, cameo cards, languages beyond EN/JP,
-sorting/filtering in the preview. See the PRD's "Explicitly not this product" table for reasoning.
+Digital ownership tracking, accounts, price history/portfolio value, gameplay data, cameo cards,
+languages beyond EN/JP, sorting/filtering in the preview. See the PRD's "Explicitly not this product"
+table for reasoning.
