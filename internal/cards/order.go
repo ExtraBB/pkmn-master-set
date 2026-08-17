@@ -7,7 +7,7 @@ import (
 
 // SortPrintings puts a card list in the order the product promises everywhere:
 // chronological by set release, so a filled binder reads as the Pokémon's history
-// from front to back. The preview, the PDF, the CSV and the printed sheets all
+// from front to back. The preview, the CSV and the printed sheets all
 // use this single ordering — "what you see is the order you get".
 func SortPrintings(ps []Printing) {
 	slices.SortStableFunc(ps, comparePrinting)

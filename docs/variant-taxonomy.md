@@ -48,7 +48,7 @@ Named explicitly, so you never have to wonder whether we forgot.
 
 ## Fields on every row
 
-Every output — the on-screen preview, the printable sheets, the PDF and the CSV — carries the same
+Every output — the on-screen preview, the printable sheets and the CSV — carries the same
 fields, in the same order:
 
 | Field | Notes |
@@ -66,8 +66,8 @@ fields, in the same order:
 bug; a stated "unknown" reads as what it is — a gap in the source data.
 
 The on-screen preview additionally shows a current Cardmarket and TCGplayer price, each linking out to
-that printing's listing. This is deliberately preview-only, not carried into the printable sheets, the
-PDF or the CSV: those are artifacts meant to be printed or filed away, and a price baked into a
+that printing's listing. This is deliberately preview-only, not carried into the printable sheets or
+the CSV: those are artifacts meant to be printed or filed away, and a price baked into a
 downloaded file goes stale the moment it's saved.
 
 ## Ordering

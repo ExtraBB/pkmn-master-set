@@ -29,7 +29,7 @@ Charizard · English · with variants        214 cards · ~24 pages
  [img]  Base Set 2        4/130   Holo Rare      Unlimited   2000
                                                     … 210 more
 ──────────────────────────────────────────────────────────────────
-   [ Printable sheets ]   [ PDF overview ]   [ CSV ]
+   [ Printable sheets ]   [ CSV ]
 ```
 
 **Counts before commitment.** Card count and estimated page count, visible next to the download

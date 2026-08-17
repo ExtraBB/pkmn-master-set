@@ -47,9 +47,9 @@ short is a product requirement, not an aspiration.
 | Gameplay data (attacks, HP, abilities) | Not what a collector needs on a placeholder or a checklist. |
 | A browsing/filtering workspace | The preview exists to confirm what you're downloading, not to become a place you spend time. The download is the deliverable. |
 
-## The three outputs
+## The two outputs
 
-All three cover the same card list for the chosen Pokémon. They differ in what they're *for*.
+Both cover the same card list for the chosen Pokémon. They differ in what they're *for*.
 
 ### 1. Printable sheets — the core output
 Card-sized placeholders, printed and cut out, slotted into empty binder pockets.
@@ -80,12 +80,7 @@ resizes the page, and the cut-outs come out wrong and don't fit the pockets. The
 actively defend against this — clear print instructions, and ideally a printed measurement ruler or
 reference mark on the page so the user can verify scale before cutting a whole stack.
 
-### 2. PDF overview — for reading
-A text table of the full card list. For reading, filing, or printing as a reference sheet to keep in
-the binder's front pocket. Text-led, not image-led: set, card number, rarity, variant, language,
-release date. Compact enough that a full Pokémon fits in a couple of pages.
-
-### 3. CSV overview — for spreadsheets
+### 2. CSV overview — for spreadsheets
 One row per card variant, one column per field, plain and unstyled. For collectors who want to
 manage the list themselves. No formatting, no merged cells, no header art — it must open cleanly in
 Excel, Numbers and Google Sheets and be immediately sortable.
@@ -113,11 +108,11 @@ Charizard · English · with variants        214 cards · ~24 pages
  [img]  Gym Challenge     3/132   Holo Rare      Blaine's    2000
                                                     … 208 more
 ──────────────────────────────────────────────────────────────────
-   [ Printable sheets ]   [ PDF overview ]   [ CSV ]
+   [ Printable sheets ]   [ CSV ]
 ```
 
-- A **compact list with thumbnails** — one row per card variant, showing the same fields the PDF and
-  CSV will contain. It's a preview of the data, so it should look like the data.
+- A **compact list with thumbnails** — one row per card variant, showing the same fields the CSV will
+  contain. It's a preview of the data, so it should look like the data.
 - Each row also shows a current Cardmarket and TCGplayer price, each linking out to that printing's
   listing — a collector deciding whether to hunt down a printing wants to know roughly what it costs,
   without this becoming a price-tracking product in its own right.
@@ -133,7 +128,7 @@ confirmation step into a workspace and pull the product back toward the digital-
 version deliberately walked away from.
 
 ### 3. Pick a format
-Three clear download options below the list, each with a one-line description of what it's for, and
+Two clear download options below the list, each with a one-line description of what it's for, and
 the card and page count alongside ("214 cards · ~24 pages").
 
 Page count matters here — printing 24 pages of placeholders is a real decision, and surprising
@@ -165,19 +160,18 @@ one.
 3. Preview the full card list on screen before downloading, with thumbnails, in the same order and
    with the same fields as the downloads.
 4. Download printable sheets with card images at true 63 × 88 mm size, with cut lines.
-5. Download a PDF overview table of the same list.
-6. Download a CSV of the same list, cleanly openable in common spreadsheet tools.
-7. Card count and estimated page count shown alongside the preview, before download.
-8. Print instructions that defend against printer scaling, with a way to verify true size.
-9. Whole flow completable with no account and no more than a search plus a click.
+5. Download a CSV of the same list, cleanly openable in common spreadsheet tools.
+6. Card count and estimated page count shown alongside the preview, before download.
+7. Print instructions that defend against printer scaling, with a way to verify true size.
+8. Whole flow completable with no account and no more than a search plus a click.
 
 ### Should have
-10. Language option (EN / JP).
-11. Variants on/off option, updating the preview list and page count live.
-12. Shareable URL per Pokémon so a previewed list can be linked or bookmarked.
+9. Language option (EN / JP).
+10. Variants on/off option, updating the preview list and page count live.
+11. Shareable URL per Pokémon so a previewed list can be linked or bookmarked.
 
 ### Won't have (v1)
-13. Sorting, filtering or per-card selection in the preview; any digital ownership tracking, accounts,
+12. Sorting, filtering or per-card selection in the preview; any digital ownership tracking, accounts,
     price history or portfolio value, gameplay data, cameo/appearance cards, languages beyond EN/JP,
     custom binder layout pickers.
 

@@ -12,16 +12,8 @@ package cards
 // correct whichever the user prints on.
 const PlaceholdersPerPage = 9
 
-// OverviewRowsPerPage is how many table rows fit on a page of the PDF overview.
-// The PRD asks for "a couple of pages" for a full Pokémon, so the table is set
-// dense: a full Charizard list lands in two pages.
-const OverviewRowsPerPage = 110
-
 // SheetPages is how many printable sheets n placeholders take.
 func SheetPages(n int) int { return ceilDiv(n, PlaceholdersPerPage) }
-
-// OverviewPages is how many pages the PDF overview of n rows takes.
-func OverviewPages(n int) int { return ceilDiv(n, OverviewRowsPerPage) }
 
 // ceilDiv rounds up. An empty list is zero pages, not one: there is nothing to
 // print, and claiming a page would be a lie the user pays for in paper.
@@ -35,9 +27,6 @@ func ceilDiv(n, per int) int {
 // SheetPages is the paper cost of this result — the number the user is really
 // deciding about on the preview screen.
 func (r Result) SheetPages() int { return SheetPages(r.PrintingCount) }
-
-// OverviewPages is the length of the PDF overview for this result.
-func (r Result) OverviewPages() int { return OverviewPages(r.PrintingCount) }
 
 // HasFoldedPrintings reports whether turning variants off folded any rows away.
 // When it is true the preview can state the delta, so the effect of the toggle is

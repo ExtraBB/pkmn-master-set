@@ -244,7 +244,6 @@ func TestPreviewWithVariants(t *testing.T) {
 		"Base Set", "4/102", "Holo Rare", "1st Edition", "Shadowless", "Unlimited",
 		"Mitsuhiro Arita", "1999",
 		"Dark Charizard", // a card whose name is not the species name reads as itself
-		"Print at 100%",  // the scale defence
 		"50 mm",          // and something to measure
 		"/download/charizard/sheets",
 		"All 7 printings shown",
@@ -452,9 +451,6 @@ func TestPreviewEmptyLanguage(t *testing.T) {
 			t.Errorf("empty list does not contain %q", want)
 		}
 	}
-	if strings.Contains(body, "Print at 100%") {
-		t.Error("there is nothing to print, so the print instructions should be absent")
-	}
 }
 
 // An unreachable source must never render as "this Pokémon has no cards".
@@ -512,15 +508,13 @@ func TestGoRedirects(t *testing.T) {
 	}
 }
 
-// The two overview downloads arrive with issue 004. Their routes exist so the
-// preview's buttons are real links rather than decoration.
-func TestOverviewDownloadsNotYetImplemented(t *testing.T) {
+// The CSV download arrives with issue 004. Its route exists so the preview's
+// button is a real link rather than decoration.
+func TestCSVDownloadNotYetImplemented(t *testing.T) {
 	h := newTestServer(t)
-	for _, format := range []string{"pdf", "csv"} {
-		rec := get(t, h, "/download/charizard/"+format)
-		if rec.Code != http.StatusNotImplemented {
-			t.Errorf("%s: status = %d, want 501", format, rec.Code)
-		}
+	rec := get(t, h, "/download/charizard/csv")
+	if rec.Code != http.StatusNotImplemented {
+		t.Errorf("status = %d, want 501", rec.Code)
 	}
 }
 
@@ -537,7 +531,7 @@ func TestSheets(t *testing.T) {
 
 	for _, want := range []string{
 		// The scale defence, on the page and in the instructions.
-		"50 mm", "Print at 100%", "fit to page",
+		"50 mm", "fit to page",
 		// The caption: set, number, printing.
 		"Base Set", "4/102", "1st Edition", "Shadowless", "Unlimited",
 		"Dark Charizard",                      // a card whose name is not the species' reads as itself

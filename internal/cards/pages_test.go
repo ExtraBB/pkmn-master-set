@@ -6,25 +6,21 @@ import "testing"
 // pinned to the numbers the design states rather than left to drift.
 func TestPageCounts(t *testing.T) {
 	tests := []struct {
-		name         string
-		printings    int
-		wantSheets   int
-		wantOverview int
+		name       string
+		printings  int
+		wantSheets int
 	}{
-		{"empty list costs no paper", 0, 0, 0},
-		{"a single printing still needs a page", 1, 1, 1},
-		{"a full page", 9, 1, 1},
-		{"one over a page", 10, 2, 1},
-		{"Charizard with variants", 214, 24, 2},
-		{"Charizard without variants", 71, 8, 1},
+		{"empty list costs no paper", 0, 0},
+		{"a single printing still needs a page", 1, 1},
+		{"a full page", 9, 1},
+		{"one over a page", 10, 2},
+		{"Charizard with variants", 214, 24},
+		{"Charizard without variants", 71, 8},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := SheetPages(tt.printings); got != tt.wantSheets {
 				t.Errorf("SheetPages(%d) = %d, want %d", tt.printings, got, tt.wantSheets)
-			}
-			if got := OverviewPages(tt.printings); got != tt.wantOverview {
-				t.Errorf("OverviewPages(%d) = %d, want %d", tt.printings, got, tt.wantOverview)
 			}
 		})
 	}

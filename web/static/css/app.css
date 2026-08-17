@@ -1,10 +1,16 @@
 /* pkmn master set — see docs/design/design.md.
    Light and dark are one system, not two designs: neutrals carry the layout and a
    single accent carries action. Every rule below reads semantic tokens, so dark
-   mode is a token swap (indigo out, teal in) rather than a second stylesheet. */
+   mode is a token swap (indigo out, teal in) rather than a second stylesheet.
+
+   Which theme is live is decided by data-theme on <html>, not by a media query:
+   the header script in templates/layout.html writes it before first paint, from
+   the remembered choice or, failing that, prefers-color-scheme. Keying on the
+   attribute keeps one dark block instead of two that can drift apart; the cost is
+   that with JavaScript off the page stays light whatever the OS says. */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
   --page: #f8faff;
   --surface: #fefdff;
@@ -66,52 +72,52 @@
   --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --page: #051c43;
-    --surface: #092045;
-    --desk: #001432;
+:root[data-theme="dark"] {
+  color-scheme: dark;
 
-    --border: #32486b;
-    --border-subtle: #182e52;
+  --page: #051c43;
+  --surface: #092045;
+  --desk: #001432;
 
-    --text: #fefdff;
-    --text-2: #d4dff0;
-    --text-3: #afbfd8;
-    --muted: #8da0bb;
+  --border: #32486b;
+  --border-subtle: #182e52;
 
-    /* Teal is the only colour in dark; indigo is not used. */
-    --action: #00d9c6;
-    --action-fg: #001432;
-    --action-text: #84f5e5;
-    --action-outline: #01544c;
-    --action-edge: #01544c;
-    --action-tint: #002824;
+  --text: #fefdff;
+  --text-2: #d4dff0;
+  --text-3: #afbfd8;
+  --muted: #8da0bb;
 
-    --accent: #00d9c6;
-    --accent-fg: #001432;
-    --accent-text: #84f5e5;
+  /* Teal is the only colour in dark; indigo is not used. */
+  --action: #00d9c6;
+  --action-fg: #001432;
+  --action-text: #84f5e5;
+  --action-outline: #01544c;
+  --action-edge: #01544c;
+  --action-tint: #002824;
 
-    --bar-bg: #071f42;
-    --bar-border: #01544c;
+  --accent: #00d9c6;
+  --accent-fg: #001432;
+  --accent-text: #84f5e5;
 
-    --pill-bg: #002824;
-    --pill-fg: #84f5e5;
+  --bar-bg: #071f42;
+  --bar-border: #01544c;
 
-    --promo-bg: #04463e;
-    --promo-fg: #fefdff;
-    --promo-muted: #a8ded6;
-    --promo-border: #01544c;
+  --pill-bg: #002824;
+  --pill-fg: #84f5e5;
 
-    --note-bg: #2b2410;
-    --note-border: #4a3d18;
-    --note-fg: #e8d9b0;
-    --note-title: #f2c86b;
+  --promo-bg: #04463e;
+  --promo-fg: #fefdff;
+  --promo-muted: #a8ded6;
+  --promo-border: #01544c;
 
-    --scrim: rgb(0 0 0 / 68%);
+  --note-bg: #2b2410;
+  --note-border: #4a3d18;
+  --note-fg: #e8d9b0;
+  --note-title: #f2c86b;
 
-    --shadow: 0 1px 2px rgb(0 0 0 / 24%), 0 8px 24px rgb(0 0 0 / 24%);
-  }
+  --scrim: rgb(0 0 0 / 68%);
+
+  --shadow: 0 1px 2px rgb(0 0 0 / 24%), 0 8px 24px rgb(0 0 0 / 24%);
 }
 
 *,
@@ -215,6 +221,50 @@ main {
   flex: none;
   font-size: 0.8125rem;
   color: var(--muted);
+}
+
+/* Quiet by default: the theme is a preference, not an action, so the button sits
+   at muted weight and only firms up on hover. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+/* On the preview header the shareable URL already claims the auto margin. */
+.share-url + .theme-toggle {
+  margin-left: 0.75rem;
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--action-outline);
+}
+
+.theme-toggle svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+}
+
+.theme-toggle .icon-moon,
+:root[data-theme="dark"] .theme-toggle .icon-sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle .icon-moon {
+  display: block;
 }
 
 .site-footer {
@@ -848,7 +898,7 @@ main {
 /* Weighted, not equal: printable sheets is the product's reason to exist. */
 .downloads {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   margin-top: 1.25rem;
 }
@@ -1018,6 +1068,14 @@ main {
   }
 
   .switch-hint {
+    display: none;
+  }
+}
+
+/* ---- print ---- */
+
+@media print {
+  .theme-toggle {
     display: none;
   }
 }

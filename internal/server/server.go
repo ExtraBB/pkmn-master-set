@@ -369,13 +369,13 @@ func (s *Server) resolve(w http.ResponseWriter, r *http.Request) (cards.Result, 
 	return res, true
 }
 
-// handleDownload serves one output format. Sheets are here; the PDF and CSV
-// overviews arrive with issue 004.
+// handleDownload serves one output format. Sheets are here; the CSV overview
+// arrives with issue 004.
 func (s *Server) handleDownload(w http.ResponseWriter, r *http.Request) {
 	switch format := r.PathValue("format"); format {
 	case "sheets":
 		s.handleSheets(w, r)
-	case "pdf", "csv":
+	case "csv":
 		http.Error(w, "not implemented yet: "+format+" downloads arrive with issue 004",
 			http.StatusNotImplemented)
 	default:

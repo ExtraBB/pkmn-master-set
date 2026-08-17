@@ -43,13 +43,13 @@ carries action.
 ## Screen notes
 
 **01 Landing.** One search box on a near-empty page, per the PRD's flow requirement. Below it,
-four example Pokémon and a single footer line naming the three outputs. Nothing else competes
+four example Pokémon and a single footer line naming the two outputs. Nothing else competes
 with the search field.
 
 **02 Preview, variants on.** Card count and page estimate sit in the header, at the same
 weight as the Pokémon name, because 24 pages of paper is the real decision on this screen.
 Options (language, include variants) sit in one tinted bar directly above the list. The table
-shows the exact fields the PDF and CSV will contain — set, number, rarity, variant, release
+shows the exact fields the CSV will contain — set, number, rarity, variant, release
 year — in chronological set order, matching the print output. The footer says "Showing 8 of
 214 — every printing is in the file" so the truncation doesn't read as an incomplete list.
 
@@ -60,9 +60,9 @@ action-coloured links would compete with the download. And the thumbnail opens t
 readable size, because 44 px cannot answer "is that the printing I think it is". Neither adds
 state: nothing is sorted, filtered, selected or ticked off.
 
-The three download options are weighted, not equal: printable sheets is the core output and
-gets the filled dark card; PDF and CSV are outlined. Each carries its own count ("214 cards ·
-24 pages", "2 pages", "214 rows").
+The two download options are weighted, not equal: printable sheets is the core output and
+gets the filled dark card; the CSV is outlined. Each carries its own count ("214 cards ·
+24 pages", "214 rows").
 
 Under them, the print-scale defence: a fixed instruction to print at 100% plus a 50 mm
 reference strip. Open question 2 in the PRD is unresolved — this draft assumes a printed
@@ -70,7 +70,7 @@ ruler strip rather than a "measure this box" mark. The strip can be toggled off 
 
 **03 Variants off.** Same screen, one placeholder per card. The variant column drops out, the
 count falls to 71 cards / 8 pages, and a teal pill states the delta (−143 cards · −16 pages)
-so the effect of the toggle is legible immediately, per requirement 11.
+so the effect of the toggle is legible immediately, per requirement 10.
 
 ## Deliberately absent
 

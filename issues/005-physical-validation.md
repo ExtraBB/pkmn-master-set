@@ -14,7 +14,7 @@ whether it worked. This issue is the loop that closes that gap.
 
 Every other issue can be verified by looking at it. This one can only be verified by printing,
 cutting, and slotting cards into a real binder. It's the difference between a product that
-technically generates a PDF and one that a collector can actually use — and it's the failure mode
+technically generates a printable page and one that a collector can actually use — and it's the failure mode
 most likely to slip through review, because it looks fine on screen right up until it doesn't fit.
 
 ## What this covers

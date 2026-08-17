@@ -147,8 +147,8 @@ func (p Pricing) IsZero() bool {
 }
 
 // Printing is one row of output: a card in one specific printing. Everything the
-// preview, the PDF, the CSV and the printable sheet need is denormalized onto it,
-// so all four render the same fields from the same struct.
+// preview, the CSV and the printable sheet need is denormalized onto it,
+// so all three render the same fields from the same struct.
 type Printing struct {
 	// ID is stable across refetches: card ID plus the semantic variant key. The
 	// source's own variantId is not stable and is deliberately unused.
@@ -367,7 +367,7 @@ func (p Printing) Lacks(field string) bool { return slices.Contains(p.Missing, f
 
 // Display renders one promised field for output.
 //
-// It exists so every output — preview, PDF, CSV, placeholder — writes the same
+// It exists so every output — preview, CSV, placeholder — writes the same
 // text for the same data, including the literal "unknown" a missing field must
 // show. A blank cell reads as a bug; a stated "unknown" reads as what it is, a gap
 // in the source. See docs/variant-taxonomy.md.

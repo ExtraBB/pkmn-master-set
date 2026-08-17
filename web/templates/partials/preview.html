@@ -28,7 +28,6 @@
   {{if .Result.Printings}}
     {{template "card-list" .}}
     {{template "downloads" .}}
-    {{template "print-note" .}}
   {{else}}
     {{template "empty-list" .}}
   {{end}}
@@ -209,36 +208,12 @@
     </div>
   </div>
   <div class="download">
-    <h2>PDF overview</h2>
-    <p>A reading table of the same list, for the binder’s front pocket.</p>
-    <div class="download-foot">
-      <span class="download-size">{{.Result.OverviewPages}} {{plural .Result.OverviewPages "page" "pages"}}</span>
-      <a class="btn btn-outline" href="{{.DownloadURL "pdf"}}">Download</a>
-    </div>
-  </div>
-  <div class="download">
     <h2>CSV</h2>
     <p>One row per card variant, unstyled. Sortable the moment it opens.</p>
     <div class="download-foot">
       <span class="download-size">{{.Result.PrintingCount}} {{plural .Result.PrintingCount "row" "rows"}}</span>
       <a class="btn btn-outline" href="{{.DownloadURL "csv"}}">Download</a>
     </div>
-  </div>
-</div>
-{{end}}
-
-{{/* The scale defence: browser and printer "fit to page" scaling is the failure
-     mode that ruins a whole stack of cut-outs, so it is warned about here, before
-     the download, and verifiable on the sheet itself. */}}
-{{define "print-note"}}
-<div class="print-note">
-  <div>
-    <p class="print-note-title">Print at 100% — turn off “fit to page”</p>
-    <p>Every sheet carries a 50 mm reference strip. Print one page, measure it, then print the stack.</p>
-  </div>
-  <div class="ruler" aria-hidden="true">
-    <div class="ruler-strip"></div>
-    <div class="ruler-scale"><span>0</span><span>50 mm</span></div>
   </div>
 </div>
 {{end}}

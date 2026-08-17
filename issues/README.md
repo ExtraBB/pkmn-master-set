@@ -10,7 +10,7 @@ done. Implementation approach is deliberately left open.
 | [001](001-card-data-foundation.md) | Get the card data right | P0 |
 | [002](002-search-and-preview.md) | Search a Pokémon and preview its card list | P0 |
 | [003](003-printable-sheets.md) | Printable placeholder sheets | P0 |
-| [004](004-pdf-and-csv-overviews.md) | PDF and CSV overviews | P1 |
+| [004](004-csv-overview.md) | CSV overview | P1 |
 | [005](005-physical-validation.md) | Prove it works on a real printer and a real binder | P0 |
 
 ## Sequencing

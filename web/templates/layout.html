@@ -3,19 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {{/* Blocking, and first in the head, so the theme is settled before the first
+       paint: a remembered choice wins, otherwise the OS preference. */}}
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem("theme"); } catch (e) {}
+      var dark = saved
+        ? saved === "dark"
+        : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+    })();
+  </script>
   <title>{{block "title" .}}pkmn master set{{end}}</title>
-  <meta name="description" content="Every card ever printed of one Pokémon, as placeholder cards at true binder size — or a PDF table, or a plain CSV.">
+  <meta name="description" content="Every card ever printed of one Pokémon, as placeholder cards at true binder size — or a plain CSV.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@500&family=Inter:wght@400;500&display=swap">
   <link rel="stylesheet" href="/static/css/app.css">
   <script src="/static/js/htmx.min.js" defer></script>
   <script src="/static/js/search.js" defer></script>
+  <script src="/static/js/theme.js" defer></script>
 </head>
 <body>
   <div class="shell">
     {{block "header" .}}
-      <header class="site-header">{{template "wordmark"}}</header>
+      <header class="site-header">{{template "wordmark"}}{{template "theme-toggle"}}</header>
     {{end}}
     <main>{{template "main" .}}</main>
     {{block "footer" .}}{{end}}
@@ -25,3 +38,15 @@
 {{end}}
 
 {{define "wordmark"}}<a class="wordmark" href="/"><span class="wordmark-dot" aria-hidden="true"></span>pkmn master set</a>{{end}}
+
+{{/* Both icons ship in the markup and CSS shows the one matching the live theme —
+     a sun in light, a moon in dark — so toggling costs no request and no redraw. */}}
+{{define "theme-toggle"}}<button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle dark mode" title="Toggle dark mode">
+  <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="4.2"></circle>
+    <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"></path>
+  </svg>
+  <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M20.5 14.3A8.6 8.6 0 0 1 9.7 3.5a8.6 8.6 0 1 0 10.8 10.8z"></path>
+  </svg>
+</button>{{end}}
