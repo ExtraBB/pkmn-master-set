@@ -112,7 +112,14 @@
              table of cards rather than a row of controls. */}}
         <button class="thumb-zoom" type="button" popovertarget="zoom-{{$p.DOMID}}"
                 aria-label="Enlarge {{$card}}">
-          <img class="thumb" src="{{.}}" alt="" width="44" height="61" loading="lazy" decoding="async">
+          {{/* One element, two resolutions: on a phone the row becomes the card, so
+               the browser picks the full-size scan; on a desktop it picks the 44px
+               thumbnail. A picture fetches exactly one of them, and lazy loading is
+               what keeps fifty printings from queueing fifty full scans. */}}
+          <picture>
+            <source media="(max-width: 44rem)" srcset="{{$p.ImageURL "high" "webp"}}">
+            <img class="thumb" src="{{.}}" alt="" width="44" height="61" loading="lazy" decoding="async">
+          </picture>
         </button>
         {{/* A popover, so clicking outside and Escape both dismiss it and the card
              sits in the top layer — all from the browser, with no script. The art

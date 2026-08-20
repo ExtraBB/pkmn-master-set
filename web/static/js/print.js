@@ -18,4 +18,15 @@
       select.form.submit();
     });
   }
+
+  // An A4 sheet is 794px wide on screen, so on a phone the preview would run off
+  // the side of the page. Scale it to fit. Screen only, and a convenience like
+  // the rest of this file: with the script blocked the sheets print at exactly
+  // the same size, the preview just scrolls sideways.
+  function fitSheets() {
+    const scale = Math.min(1, (window.innerWidth - 32) / 794);
+    document.documentElement.style.setProperty("--sheet-zoom", scale);
+  }
+  fitSheets();
+  window.addEventListener("resize", fitSheets);
 })();

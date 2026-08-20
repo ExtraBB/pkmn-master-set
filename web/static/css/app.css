@@ -1056,13 +1056,58 @@ main {
   .preview-counts {
     margin-left: 0;
     text-align: left;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
   }
 }
 
+/* ---- phones ---- */
+
+/* Below this width the table stops being a table. A nine-column grid cannot be
+   shrunk into a phone, and shrinking it was costing the one thing worth looking
+   at: on the old rules the thumbnail column was the first to go, leaving a
+   text-only list of a product whose whole point is the card art. So the row
+   becomes the card — full-size scan, one caption line — and the columns that
+   cannot be read at this width stand down. */
+
 @media (max-width: 44rem) {
-  .col-rarity,
-  .col-thumb {
-    display: none;
+  main {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  /* The preview header is three things in source order — wordmark, search,
+     toggle. Reordering keeps the two small ones on the first line and gives the
+     search a line of its own, rather than wrapping the toggle away on its own. */
+  .site-header-preview .theme-toggle {
+    order: 2;
+  }
+
+  .site-header-preview .search-compact {
+    order: 3;
+    flex: 1 0 100%;
+    margin: 0.75rem 0 0;
+  }
+
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .hero {
+    padding: 3rem 0 1.5rem;
+  }
+
+  .hero-message {
+    padding-top: 2rem;
+  }
+
+  .hero-sub {
+    margin: 1.25rem auto 2rem;
+  }
+
+  .search-hero {
+    height: 3rem;
+    padding: 0 1rem;
   }
 
   .options {
@@ -1073,6 +1118,127 @@ main {
 
   .switch-hint {
     display: none;
+  }
+
+  /* ---- the card column ---- */
+
+  /* The list is no longer a surface with rows inside it: each card stands on the
+     page on its own. */
+  .card-list {
+    background: none;
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .card-list table,
+  .card-list tbody,
+  .card-list td {
+    display: block;
+  }
+
+  .card-list thead {
+    display: none;
+  }
+
+  /* Flex rather than block, so the art takes a line of its own and the caption
+     cells flow together on the next one. 22rem stops the card from ballooning on
+     a wide phone or a rotated one. */
+  .card-list tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.4rem;
+    max-width: 22rem;
+    margin: 0 auto 1.75rem;
+  }
+
+  .card-list td {
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .card-list .col-rarity,
+  .card-list .col-illustrator,
+  .card-list .col-released,
+  .card-list .col-price {
+    display: none;
+  }
+
+  .card-list .col-thumb {
+    flex: 0 0 100%;
+    width: auto;
+  }
+
+  .thumb-zoom {
+    width: 100%;
+    /* The art is already full size here, so there is nothing to enlarge and
+       tapping it does nothing. */
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .thumb,
+  .thumb-blank {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 63 / 88;
+    border-radius: 10px;
+  }
+
+  .thumb {
+    box-shadow: var(--shadow);
+  }
+
+  /* Set · number · variant, one line under the card. The separators are drawn by
+     the cells that follow, so the markup stays a table row. */
+  .card-list .col-set,
+  .card-list .col-number,
+  .card-list .col-variant {
+    padding-top: 0.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .card-list .col-number::before,
+  .card-list .col-variant::before {
+    content: "·";
+    margin-right: 0.4rem;
+    color: var(--muted);
+  }
+
+  /* A printing with no variant label would otherwise leave a dangling separator. */
+  .card-list .col-variant:empty {
+    display: none;
+  }
+
+  .list-footer {
+    flex-wrap: wrap;
+  }
+
+  .list-footer .btn {
+    flex: 1 0 100%;
+    margin-left: 0;
+  }
+
+  .download {
+    padding: 1.125rem 1.25rem;
+  }
+
+  .download-foot {
+    flex-wrap: wrap;
+  }
+
+  .print-note {
+    gap: 1rem;
+  }
+
+  .ruler {
+    margin-left: 0;
+  }
+
+  .empty {
+    padding: 1.75rem 1.25rem;
   }
 }
 

@@ -25,6 +25,10 @@
  */
 
 :root {
+  /* On screen only, and only on a narrow one: print.js sets this so an A4 sheet
+     fits a phone. Paper geometry is untouched — this lives under @media screen. */
+  --sheet-zoom: 1;
+
   --ink: #001432;
   --ink-soft: #4f6486;
   --cut: #9aa8bd;
@@ -342,7 +346,10 @@ html, body {
     border: 1px solid #00d9c6;
   }
 
-  /* On screen the sheets are a preview of paper, so they are a sheet of A4. */
+  /* On screen the sheets are a preview of paper, so they are a sheet of A4. A4 is
+     794px wide, which no phone has, so the whole sheet is scaled to fit rather
+     than left to spill sideways. Scaling the preview cannot scale the print: the
+     rule is inside @media screen, and @media print never sees it. */
   .sheet {
     padding: 4mm;
     margin-bottom: 1.5rem;
@@ -350,5 +357,19 @@ html, body {
     height: 297mm;
     border-radius: 2px;
     box-shadow: 0 2px 12px rgb(0 20 50 / 12%);
+    zoom: var(--sheet-zoom);
+  }
+
+  @media (max-width: 44rem) {
+    body { padding: 1rem 0.75rem 2rem; }
+
+    .banner { padding: 1rem 1.125rem; }
+
+    /* Stacked, so the art picker and the two buttons are full-width targets
+       instead of three things fighting over 350px. */
+    .banner-controls { align-items: stretch; flex-direction: column; }
+
+    .art-picker,
+    .banner-actions { justify-content: space-between; }
   }
 }
